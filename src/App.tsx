@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { ThemeToggle } from './components/ThemeToggle'
-import { PerformanceMonitor } from './components/PerformanceMonitor'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
@@ -163,12 +162,7 @@ function App() {
 
   return (
     <div className={APP_STYLES.container}>
-      {/* Performance Monitor en développement */}
-      <PerformanceMonitor
-        enabled={process.env.NODE_ENV === 'development'}
-        position="top-left"
-        updateInterval={1000}
-      />
+      {/* Performance Monitor retiré */}
 
       <div className={APP_STYLES.wrapper}>
         {/* Header */}
