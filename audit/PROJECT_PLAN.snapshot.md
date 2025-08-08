@@ -160,7 +160,3 @@ Checklist:
 
 - [ ] 2025‑08‑08: Plan initial créé et structure de base ajoutée
 - [ ] …
-
----
-
-Latest audit: see docs/AUDIT_SUMMARY.md (generated on ven. 08 août 2025 14:34:39 CEST)

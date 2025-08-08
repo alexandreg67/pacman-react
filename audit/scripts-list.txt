@@ -1,0 +1,12 @@
+dev
+build
+preview
+lint
+lint:fix
+format
+typecheck
+test
+test:run
+coverage
+prepare
+lint-staged
