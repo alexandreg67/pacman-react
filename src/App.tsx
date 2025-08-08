@@ -1,30 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
+import { ThemeToggle } from './components/ThemeToggle'
 import './App.css'
+import { Board } from './components/Board'
+import { useGame } from './game/react/useGame'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { state, stepInput, reset } = useGame()
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp') stepInput('up')
+      else if (e.key === 'ArrowDown') stepInput('down')
+      else if (e.key === 'ArrowLeft') stepInput('left')
+      else if (e.key === 'ArrowRight') stepInput('right')
+      else if (e.key.toLowerCase() === 'r') reset()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [stepInput, reset])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container mx-auto p-4 flex flex-col gap-6 items-center">
+      <h1 className="text-3xl font-bold">Pacman (demo)</h1>
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        <button className="btn btn-sm" onClick={reset}>
+          Reset (R)
+        </button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+      <Board state={state} />
+      <p className="text-sm opacity-70">Use arrow keys to move. Press R to reset.</p>
+    </div>
   )
 }
 
