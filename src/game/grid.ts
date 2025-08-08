@@ -75,3 +75,55 @@ export function parseMap(lines: string[]): { grid: Grid; spawn: SpawnInfo } {
 export function demoGrid(): { grid: Grid; spawn: SpawnInfo } {
   return parseMap(DEMO_MAP)
 }
+
+/**
+ * Analyse une grille pour identifier les lignes où la première ou la dernière case
+ * n'est pas un mur (Cell.Wall). Ces lignes correspondent aux tunnels horizontaux.
+ * @param grid La grille à analyser
+ * @returns Un tableau des indices des lignes contenant des tunnels
+ */
+export function computeTunnelRows(grid: Grid): number[] {
+  const tunnelRows: number[] = []
+
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y]
+    if (!row || row.length === 0) continue
+
+    const firstCell = row[0]
+    const lastCell = row[row.length - 1]
+
+    // Si la première ou la dernière case n'est pas un mur, c'est une ligne de tunnel
+    if (firstCell !== Cell.Wall || lastCell !== Cell.Wall) {
+      tunnelRows.push(y)
+    }
+  }
+
+  return tunnelRows
+}
+
+/**
+ * Analyse une grille pour identifier les colonnes où la première ou la dernière case
+ * n'est pas un mur (Cell.Wall). Ces colonnes correspondent aux tunnels verticaux.
+ * REMARQUE: Cette fonction est prête pour une future extension mais n'est pas
+ * utilisée dans le gameplay classique Pac-Man.
+ * @param grid La grille à analyser
+ * @returns Un tableau des indices des colonnes contenant des tunnels
+ */
+export function computeTunnelCols(grid: Grid): number[] {
+  const tunnelCols: number[] = []
+
+  if (grid.length === 0) return tunnelCols
+  const width = grid[0]?.length ?? 0
+
+  for (let x = 0; x < width; x++) {
+    const firstCell = grid[0]?.[x]
+    const lastCell = grid[grid.length - 1]?.[x]
+
+    // Si la première ou la dernière case n'est pas un mur, c'est une colonne de tunnel
+    if (firstCell !== Cell.Wall || lastCell !== Cell.Wall) {
+      tunnelCols.push(x)
+    }
+  }
+
+  return tunnelCols
+}

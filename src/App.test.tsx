@@ -4,5 +4,5 @@ import App from './App'
 
 it('renders heading', () => {
   render(<App />)
-  expect(screen.getByRole('heading', { name: /pacman \(demo\)/i })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /pac-man/i })).toBeInTheDocument()
 })

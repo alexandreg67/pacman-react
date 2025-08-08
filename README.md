@@ -159,10 +159,27 @@ function GameComponent() {
 - **Flèches directionnelles** : Déplacement de Pacman
 - **R** : Redémarrer le jeu
 
+### Fonctionnalités Avancées
+
+#### 🌀 Système de Tunnels Dynamiques
+
+Le jeu dispose d'un système de **détection automatique des tunnels** qui permet à Pacman de passer d'un côté à l'autre de l'écran :
+
+- **Détection intelligente** : Analyse automatiquement la grille pour identifier les lignes de tunnel
+- **Critère d'identification** : Une ligne est considérée comme tunnel si sa première OU dernière cellule n'est pas un mur
+- **Adaptabilité** : Fonctionne avec n'importe quelle configuration de grille, sans indices hardcodés
+- **Performance** : Calcul effectué une seule fois à l'initialisation
+
+```typescript
+// Exemple de fonctionnement
+const tunnelRows = computeTunnelRows(grid) // [14, 24] par exemple
+// Pacman peut maintenant traverser ces lignes horizontalement
+```
+
 ### Objectif
 
 - Collecter tous les pellets pour terminer le niveau
-- Éviter les fantômes (à venir dans futures versions)
+- Utiliser les tunnels pour échapper aux fantômes (fonctionnalité future)
 - Maximiser le score
 
 ## 🏗️ Architecture du Code

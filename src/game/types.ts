@@ -25,6 +25,8 @@ export type GameState = {
   pelletsRemaining: number
   frightenedTicks: number
   tickCount: number
+  tunnelRows: number[]
+  // Future: tunnelCols: number[] pour le wrap vertical
 }
 
 export const SCORES = {

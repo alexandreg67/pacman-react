@@ -1,4 +1,4 @@
-import { CLASSIC_MAP, parseMap } from './grid'
+import { CLASSIC_MAP, parseMap, computeTunnelRows } from './grid'
 import type { Direction, GameState } from './types'
 import { Cell } from './types'
 import { attemptMove } from './entities/pacman'
@@ -10,6 +10,11 @@ export function initialState(): GameState {
   const pellets = grid
     .map((row) => row.filter((c) => c === Cell.Pellet || c === Cell.PowerPellet).length)
     .reduce((a, b) => a + b, 0)
+
+  // Détection dynamique des tunnels horizontaux
+  // Analyse automatiquement la grille pour identifier les lignes où le wrap est possible
+  // Remplace les anciennes constantes hardcodées par un algorithme adaptatif
+  const tunnelRows = computeTunnelRows(grid)
   return {
     grid,
     pacman: { ...spawn.pacman },
@@ -20,6 +25,7 @@ export function initialState(): GameState {
     pelletsRemaining: pellets,
     frightenedTicks: 0,
     tickCount: 0,
+    tunnelRows,
   }
 }
 

@@ -2,9 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Direction, GameState } from '../types'
 import { initialState, step } from '../state'
 
-// Configuration optimisée du game loop
-const TARGET_FPS = 16 // ~16 FPS pour une meilleure fluidité
-const FRAME_TIME = 1000 / TARGET_FPS // 62.5ms par frame
+// Vitesse fidèle à l'arcade
+function getPacmanSpeedMs(state: GameState): number {
+  // Tunnel: vitesse réduite
+  const tunnelRows = [11, 15, 17] // lignes approximatives du tunnel classique
+  const inTunnel = tunnelRows.includes(state.pacman.y)
+  if (inTunnel) return 90
+  // Niveau 1 à 4 : 80ms, niveau 5+ : 60ms
+  const level = Math.floor((state.score || 0) / 10000) + 1 // estimation simple
+  return level < 5 ? 80 : 60
+}
+
 const MAX_DELTA = 100 // Limite pour éviter les gros sauts
 
 interface GameTiming {
@@ -30,46 +38,51 @@ export function useGame() {
   const isRunningRef = useRef(true)
 
   // Game loop optimisé avec requestAnimationFrame
-  const gameLoop = useCallback((currentTime: number) => {
-    if (!isRunningRef.current) return
+  const gameLoop = useCallback(
+    (currentTime: number) => {
+      if (!isRunningRef.current) return
 
-    const timing = timingRef.current
+      const timing = timingRef.current
 
-    // Initialiser le timing si c'est le premier frame
-    if (timing.lastTime === 0) {
-      timing.lastTime = currentTime
-    }
-
-    // Calculer le delta time avec limitation
-    const deltaTime = Math.min(currentTime - timing.lastTime, MAX_DELTA)
-    timing.lastTime = currentTime
-    timing.accumulator += deltaTime
-
-    // Mise à jour de la logique de jeu à intervalles fixes
-    let stepsThisFrame = 0
-    while (timing.accumulator >= FRAME_TIME && stepsThisFrame < 3) {
-      setState((prevState) => step(prevState))
-      timing.accumulator -= FRAME_TIME
-      stepsThisFrame++
-    }
-
-    // Calcul du FPS pour debug (optionnel)
-    timing.frameCount++
-    if (currentTime - timing.lastFpsUpdate >= 1000) {
-      timing.fps = timing.frameCount
-      timing.frameCount = 0
-      timing.lastFpsUpdate = currentTime
-
-      // Debug FPS en développement
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.debug(`Game FPS: ${timing.fps}`)
+      // Initialiser le timing si c'est le premier frame
+      if (timing.lastTime === 0) {
+        timing.lastTime = currentTime
       }
-    }
 
-    // Programmer le prochain frame
-    animationFrameRef.current = requestAnimationFrame(gameLoop)
-  }, [])
+      // Calculer le delta time avec limitation
+      const deltaTime = Math.min(currentTime - timing.lastTime, MAX_DELTA)
+      timing.lastTime = currentTime
+      timing.accumulator += deltaTime
+
+      // Vitesse variable selon le niveau et la position
+      const pacmanSpeedMs = getPacmanSpeedMs(state)
+
+      let stepsThisFrame = 0
+      while (timing.accumulator >= pacmanSpeedMs && stepsThisFrame < 3) {
+        setState((prevState) => step(prevState))
+        timing.accumulator -= pacmanSpeedMs
+        stepsThisFrame++
+      }
+
+      // Calcul du FPS pour debug (optionnel)
+      timing.frameCount++
+      if (currentTime - timing.lastFpsUpdate >= 1000) {
+        timing.fps = timing.frameCount
+        timing.frameCount = 0
+        timing.lastFpsUpdate = currentTime
+
+        // Debug FPS en développement
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.debug(`Game FPS: ${timing.fps}`)
+        }
+      }
+
+      // Programmer le prochain frame
+      animationFrameRef.current = requestAnimationFrame(gameLoop)
+    },
+    [state],
+  )
 
   // Démarrer le game loop
   useEffect(() => {

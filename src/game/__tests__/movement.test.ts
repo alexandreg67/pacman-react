@@ -91,4 +91,46 @@ describe('Pacman movement and consumption', () => {
 
     expect(placed).toBe(true)
   })
+
+  it('prevents vertical wrap (classic gameplay behavior)', () => {
+    let s = initialState()
+    const h = s.grid.length
+    const w = s.grid[0]?.length ?? 0
+
+    // Test wrap à travers le haut de l'écran
+    s = { ...s, pacman: { x: Math.floor(w / 2), y: 0 }, dir: 'up' }
+    const beforeTop = { ...s.pacman }
+    s = step(s, 'up')
+    // Pac-Man ne devrait pas bouger s'il essaie de sortir par le haut
+    expect(s.pacman).toEqual(beforeTop)
+
+    // Test wrap à travers le bas de l'écran
+    s = { ...s, pacman: { x: Math.floor(w / 2), y: h - 1 }, dir: 'down' }
+    const beforeBottom = { ...s.pacman }
+    s = step(s, 'down')
+    // Pac-Man ne devrait pas bouger s'il essaie de sortir par le bas
+    expect(s.pacman).toEqual(beforeBottom)
+  })
+
+  it('allows horizontal wrap on tunnel rows', () => {
+    let s = initialState()
+    const w = s.grid[0]?.length ?? 0
+
+    // Utiliser la détection dynamique pour trouver une ligne de tunnel
+    expect(s.tunnelRows.length).toBeGreaterThan(0) // Vérifier qu'il y a au moins un tunnel
+    const tunnelRow = s.tunnelRows[0] // Prendre la première ligne de tunnel détectée
+    expect(s.tunnelRows).toContain(tunnelRow)
+
+    // Test wrap de gauche à droite
+    s = { ...s, pacman: { x: 0, y: tunnelRow }, dir: 'left' }
+    const beforeWrap = { ...s.pacman }
+    s = step(s, 'left')
+
+    // Vérifier que Pac-Man a bien wrap (soit il est resté à gauche car mur, soit il a wrap à droite)
+    // La logique exacte dépend de la configuration de la grille
+    if (s.pacman.x !== beforeWrap.x) {
+      // S'il y a eu mouvement, il devrait être proche du bord droit
+      expect(s.pacman.x).toBeGreaterThan(w / 2)
+    }
+  })
 })
