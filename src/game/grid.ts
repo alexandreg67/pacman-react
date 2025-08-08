@@ -10,8 +10,8 @@ export function parseMap(lines: string[]): { grid: Grid; spawn: SpawnInfo } {
   let spawn: SpawnInfo | null = null
   for (let y = 0; y < lines.length; y++) {
     const row: Cell[] = []
-    for (let x = 0; x < lines[y].length; x++) {
-      const ch = lines[y][x]
+    for (let x = 0; x < (lines[y]?.length ?? 0); x++) {
+      const ch = lines[y]![x]!
       switch (ch) {
         case '#':
           row.push(Cell.Wall)

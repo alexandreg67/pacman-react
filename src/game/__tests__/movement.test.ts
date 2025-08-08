@@ -31,7 +31,7 @@ describe('Pacman movement and consumption', () => {
     let target: { x: number; y: number } | null = null
     for (let y = 0; y < s.grid.length; y++) {
       for (let x = 0; x < s.grid[0].length; x++) {
-        if (s.grid[y][x] === 'PowerPellet') {
+        if (s.grid[y][x] === Cell.PowerPellet) {
           target = { x, y }
           break
         }
@@ -52,7 +52,8 @@ describe('Pacman movement and consumption', () => {
 
     let placed = false
     for (const n of neighbors) {
-      if (s.grid[n.y]?.[n.x] && s.grid[n.y][n.x] !== Cell.Wall) {
+      const cell = s.grid[n.y]?.[n.x]
+      if (cell && cell !== Cell.Wall) {
         s = { ...s, pacman: { x: n.x, y: n.y } }
         const preScore = s.score
         s = step(s, n.dir)
