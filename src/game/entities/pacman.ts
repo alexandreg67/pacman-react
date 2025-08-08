@@ -1,4 +1,4 @@
-import { Direction, GameState } from '../types'
+import type { Direction, GameState } from '../types'
 import { isWall } from '../logic/collision'
 
 export function dirToDelta(dir: Direction): { dx: number; dy: number } {

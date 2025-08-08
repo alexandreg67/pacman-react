@@ -1,5 +1,6 @@
 import { demoGrid } from './grid'
-import { Direction, GameState, Cell } from './types'
+import type { Direction, GameState } from './types'
+import { Cell } from './types'
 import { attemptMove } from './entities/pacman'
 import { consumeIfAny } from './logic/scoring'
 

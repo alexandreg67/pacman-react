@@ -1,12 +1,13 @@
 export type Vec = { x: number; y: number }
 export type Direction = 'up' | 'down' | 'left' | 'right'
 
-export enum Cell {
-  Empty = 0,
-  Wall = 1,
-  Pellet = 2,
-  PowerPellet = 3,
-}
+export const Cell = {
+  Empty: 'Empty',
+  Wall: 'Wall',
+  Pellet: 'Pellet',
+  PowerPellet: 'PowerPellet',
+} as const
+export type Cell = (typeof Cell)[keyof typeof Cell]
 
 export type Grid = Cell[][]
 
@@ -27,8 +28,8 @@ export type GameState = {
 export const SCORES = {
   pellet: 10,
   powerPellet: 50,
-}
+} as const
 
 export const TIMERS = {
   frightenedDurationTicks: 40,
-}
+} as const

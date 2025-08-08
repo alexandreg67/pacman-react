@@ -1,4 +1,5 @@
-import { Cell, Grid, SpawnInfo } from './types'
+import { Cell } from './types'
+import type { Grid, SpawnInfo } from './types'
 
 // Demo map (small) — characters legend:
 // # = Wall, . = Pellet, o = Power pellet, space = Empty, P = Pacman spawn

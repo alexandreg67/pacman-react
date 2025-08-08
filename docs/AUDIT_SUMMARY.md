@@ -1,14 +1,11 @@
 # Audit Summary
 
-Date: ven. 08 août 2025 14:34:22 CEST
+Date: ven. 08 août 2025 14:42:02 CEST
 
 ## Tooling
 
 Node: v20.19.4
-Package manager: Using
-Package manager: package
-Package manager: manager:
-Package manager: npm
+Package manager: npm (10.8.2)
 
 ## Config files
 
@@ -18,27 +15,25 @@ present: vite.config.ts
 missing: vite.config.js
 missing: jest.config.ts
 missing: jest.config.js
-missing: vitest.config.ts
-missing: vitest.config.ts
+present: vitest.config.ts
 missing: cypress.config.ts
 missing: cypress.config.js
-missing: playwright.config.ts
-missing: playwright.config.ts
-missing: .eslintrc.cjs
+present: playwright.config.ts
+present: .eslintrc.cjs
 missing: .eslintrc.js
 missing: .eslintrc.json
 present: .prettierrc
 missing: .prettierrc.json
 missing: .prettierrc.cjs
-missing: .editorconfig
-missing: .husky/commit-msg
-present: .husky/pre-commit
-missing: .github/workflows
+present: .editorconfig
+present: commit-msg
+present: pre-commit
+present: workflows
 missing: Dockerfile
 missing: docker-compose.yml
-missing: .env.example
+present: .env.example
 present: .nvmrc
-missing: .node-version
+present: .node-version
 missing: CODE_OF_CONDUCT.md
 missing: CONTRIBUTING.md
 missing: LICENSE
@@ -60,17 +55,17 @@ lint-staged
 
 ## Lint/Test/Build outcomes (see logs in audit/)
 
-- Lint: see audit/lint.log
-- Tests: see audit/test.log
-- Typecheck: see audit/typecheck.log
-- Build: see audit/build.log
+- Lint: PASS (exit 0). See audit/lint.log
+- Typecheck: PASS (exit 0). See audit/typecheck.log
+- Tests: PASS (exit 0). See audit/test.log
+- Build: PASS (exit 0). See audit/build.log
 
-## Machine audit suggestions (to review before editing docs/PROJECT_PLAN.md)
+## Notes and suggestions
 
-- If .eslintrc\* present and lint passes, mark ESLint as complete.
-- If .prettierrc\* present and format check passes, mark Prettier as complete.
-- If tsconfig.json present and typecheck passes, mark TypeScript as complete.
-- If vitest/jest config and tests pass, mark Unit Tests baseline as complete.
-- If .github/workflows exists and CI is green, mark CI as complete.
-- If cypress/playwright config exists, mark E2E setup as present.
-- For Pacman features, compare src/ files to planned components (Pacman, Ghost, Board, Collision, Scoring) and update accordingly.
+- ESLint present and lint passing.
+- Prettier config present.
+- TypeScript present and typecheck passing.
+- Vitest present; tests passing.
+- Playwright config present; consider adding an e2e script and a smoke test.
+- CI workflow exists; ensure coverage for dev/main split if desired.
+- Consider adding CODE_OF_CONDUCT.md, CONTRIBUTING.md, and LICENSE.

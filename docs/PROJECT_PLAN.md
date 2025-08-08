@@ -40,8 +40,8 @@ Critères d’acceptation:
 
 Checklist:
 
-- [ ] `daisyui` installé
-- [ ] `tailwind.config.ts` mis à jour (plugins + thèmes)
+- [x] `daisyui` installé
+- [x] `tailwind.config.ts` mis à jour (plugins + thèmes)
 - [ ] `ThemeToggle` (test unitaire minimal)
 
 ---
@@ -105,8 +105,8 @@ Critères d’acceptation:
 
 Checklist:
 
-- [ ] Dépendances installées
-- [ ] `playwright.config.ts` prêt
+- [x] Dépendances installées
+- [x] `playwright.config.ts` prêt
 - [ ] Test de fumée vert
 
 ---
@@ -137,6 +137,7 @@ Checklist:
 
 - [ ] `.github/workflows/ci-dev.yml`
 - [ ] `.github/workflows/ci-main.yml`
+- [x] Workflow de base présent (`.github/workflows/ci.yml`)
 
 ---
 
@@ -163,4 +164,4 @@ Checklist:
 
 ---
 
-Latest audit: see docs/AUDIT_SUMMARY.md (generated on ven. 08 août 2025 14:34:39 CEST)
+Latest audit: see docs/AUDIT_SUMMARY.md (generated on ven. 08 août 2025 14:42:02 CEST)

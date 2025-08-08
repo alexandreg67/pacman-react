@@ -1,4 +1,5 @@
-import { Cell, GameState, SCORES, TIMERS } from '../types'
+import { Cell, SCORES, TIMERS } from '../types'
+import type { GameState } from '../types'
 
 export function consumeIfAny(state: GameState): GameState {
   const { x, y } = state.pacman
