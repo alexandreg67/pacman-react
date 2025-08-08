@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { initialState, step } from '../state'
-import { TIMERS } from '../types'
+import { TIMERS, Cell } from '../types'
 
 describe('Pacman movement and consumption', () => {
   it('moves into a pellet, increases score and decreases pelletsRemaining', () => {
@@ -52,7 +52,7 @@ describe('Pacman movement and consumption', () => {
 
     let placed = false
     for (const n of neighbors) {
-      if (s.grid[n.y]?.[n.x] && s.grid[n.y][n.x] !== 'Wall') {
+      if (s.grid[n.y]?.[n.x] && s.grid[n.y][n.x] !== Cell.Wall) {
         s = { ...s, pacman: { x: n.x, y: n.y } }
         const preScore = s.score
         s = step(s, n.dir)

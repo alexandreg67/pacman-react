@@ -1,14 +1,15 @@
 import { Cell, SCORES, TIMERS } from '../types'
 import type { GameState } from '../types'
 
+function updateGridAt(grid: Array<Array<Cell>>, x: number, y: number, newValue: Cell) {
+  return grid.map((row, yy) => row.map((c, xx) => (xx === x && yy === y ? newValue : c)))
+}
+
 export function consumeIfAny(state: GameState): GameState {
   const { x, y } = state.pacman
   const cell = state.grid[y][x]
   if (cell === Cell.Pellet) {
-    // consume pellet
-    const newGrid = state.grid.map((row, yy) =>
-      row.map((c, xx) => (xx === x && yy === y ? Cell.Empty : c)),
-    )
+    const newGrid = updateGridAt(state.grid, x, y, Cell.Empty)
     return {
       ...state,
       grid: newGrid,
@@ -17,9 +18,7 @@ export function consumeIfAny(state: GameState): GameState {
     }
   }
   if (cell === Cell.PowerPellet) {
-    const newGrid = state.grid.map((row, yy) =>
-      row.map((c, xx) => (xx === x && yy === y ? Cell.Empty : c)),
-    )
+    const newGrid = updateGridAt(state.grid, x, y, Cell.Empty)
     return {
       ...state,
       grid: newGrid,

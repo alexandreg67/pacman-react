@@ -6,11 +6,8 @@ type Theme = (typeof THEMES)[number]
 
 function getInitialTheme(): Theme {
   const raw = localStorage.getItem('theme')
-  if (raw) {
-    const maybe = raw as unknown
-    if (typeof maybe === 'string' && (THEMES as readonly string[]).includes(maybe)) {
-      return maybe as Theme
-    }
+  if (typeof raw === 'string' && (THEMES as readonly string[]).includes(raw)) {
+    return raw as Theme
   }
   return 'emerald'
 }
