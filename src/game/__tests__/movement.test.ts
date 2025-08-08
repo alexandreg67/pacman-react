@@ -24,26 +24,48 @@ describe('Pacman movement and consumption', () => {
   })
 
   it('power pellet grants more score and enables frightened mode', () => {
-    // Walk Pacman near the power pellet in demo map
+    // Move Pacman adjacent to a power pellet and then step onto it
     let s = initialState()
-    // From spawn (row 1, col 1), path to power pellet at row 3: go right a few tiles then down
-    s = step(s, 'right') // pellet +10
-    s = step(s, 'right') // pellet +10
-    // navigate around walls depending on demo layout
-    s = step(s, 'down')
-    s = step(s, 'down') // reach row with power pellet eventually
-    // try to reach the 'o' cell by moving right until consumed
-    for (let i = 0; i < 6; i++) {
-      const preScore = s.score
-      const prevPos = { ...s.pacman }
-      s = step(s, 'right')
-      // Once we land on power pellet, score jumps by 50 and frightenedTicks set
-      if (s.score === preScore + 50) {
-        expect(s.frightenedTicks).toBeGreaterThan(0)
-        expect(s.frightenedTicks).toBeLessThanOrEqual(TIMERS.frightenedDurationTicks)
-        expect(s.pacman).not.toEqual(prevPos)
-        break
+
+    // Find a power pellet cell
+    let target: { x: number; y: number } | null = null
+    for (let y = 0; y < s.grid.length; y++) {
+      for (let x = 0; x < s.grid[0].length; x++) {
+        if (s.grid[y][x] === 'PowerPellet') {
+          target = { x, y }
+          break
+        }
+      }
+      if (target) break
+    }
+    expect(Boolean(target)).toBe(true)
+
+    if (!target) return
+
+    // Pick an open neighbor next to target to place Pacman
+    const neighbors: Array<{ x: number; y: number; dir: 'up' | 'down' | 'left' | 'right' }> = [
+      { x: target.x - 1, y: target.y, dir: 'right' },
+      { x: target.x + 1, y: target.y, dir: 'left' },
+      { x: target.x, y: target.y - 1, dir: 'down' },
+      { x: target.x, y: target.y + 1, dir: 'up' },
+    ]
+
+    let placed = false
+    for (const n of neighbors) {
+      if (s.grid[n.y]?.[n.x] && s.grid[n.y][n.x] !== 'Wall') {
+        s = { ...s, pacman: { x: n.x, y: n.y } }
+        const preScore = s.score
+        s = step(s, n.dir)
+        // consumed if score jumped by 50 and frightened set
+        if (s.score === preScore + 50) {
+          expect(s.frightenedTicks).toBeGreaterThan(0)
+          expect(s.frightenedTicks).toBeLessThanOrEqual(TIMERS.frightenedDurationTicks)
+          placed = true
+          break
+        }
       }
     }
+
+    expect(placed).toBe(true)
   })
 })

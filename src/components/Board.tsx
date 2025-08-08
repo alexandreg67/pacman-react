@@ -3,11 +3,10 @@ import type { GameState } from '../game/types'
 
 type Props = {
   state: GameState
+  tileSize?: number
 }
 
-const TILE = 20
-
-export function Board({ state }: Props) {
+export function Board({ state, tileSize = 20 }: Props) {
   const h = state.grid.length
   const w = state.grid[0]?.length ?? 0
   return (
@@ -15,20 +14,20 @@ export function Board({ state }: Props) {
       <div
         className="relative"
         style={{
-          width: w * TILE,
-          height: h * TILE,
+          width: w * tileSize,
+          height: h * tileSize,
         }}
       >
         {/* tiles */}
         <div
           className="absolute top-0 left-0 grid"
-          style={{ gridTemplateColumns: `repeat(${w}, ${TILE}px)` }}
+          style={{ gridTemplateColumns: `repeat(${w}, ${tileSize}px)` }}
         >
           {state.grid.map((row, y) =>
             row.map((cell, x) => (
               <div
                 key={`${x}-${y}`}
-                style={{ width: TILE, height: TILE }}
+                style={{ width: tileSize, height: tileSize }}
                 className={
                   cell === Cell.Wall
                     ? 'bg-blue-700'
@@ -57,9 +56,9 @@ export function Board({ state }: Props) {
         <div
           className="absolute transition-transform duration-75"
           style={{
-            transform: `translate(${state.pacman.x * TILE}px, ${state.pacman.y * TILE}px)`,
-            width: TILE,
-            height: TILE,
+            transform: `translate(${state.pacman.x * tileSize}px, ${state.pacman.y * tileSize}px)`,
+            width: tileSize,
+            height: tileSize,
           }}
           aria-label="pacman"
         >

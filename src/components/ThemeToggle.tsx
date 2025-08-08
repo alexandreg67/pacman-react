@@ -5,8 +5,13 @@ const THEMES = ['emerald', 'dark'] as const
 type Theme = (typeof THEMES)[number]
 
 function getInitialTheme(): Theme {
-  const fromStorage = localStorage.getItem('theme') as Theme | null
-  if (fromStorage && THEMES.includes(fromStorage)) return fromStorage
+  const raw = localStorage.getItem('theme')
+  if (raw) {
+    const maybe = raw as unknown
+    if (typeof maybe === 'string' && (THEMES as readonly string[]).includes(maybe)) {
+      return maybe as Theme
+    }
+  }
   return 'emerald'
 }
 
