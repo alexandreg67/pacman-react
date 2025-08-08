@@ -14,13 +14,27 @@ export function dirToDelta(dir: Direction): { dx: number; dy: number } {
   }
 }
 
-export function attemptMove(state: GameState, dir: Direction): GameState {
-  const { dx, dy } = dirToDelta(dir)
-  const nx = state.pacman.x + dx
-  const ny = state.pacman.y + dy
-  if (isWall(state.grid, nx, ny)) {
-    // blocked; keep position, but update facing direction
-    return { ...state, dir }
+/**
+ * Try to move in the input direction. If blocked by a wall, attempt to
+ * continue moving in the current direction (classic buffered turning behavior).
+ */
+export function attemptMove(state: GameState, inputDir: Direction): GameState {
+  // First, try the input direction (requested turn)
+  const tryDir = (dir: Direction): GameState | null => {
+    const { dx, dy } = dirToDelta(dir)
+    const nx = state.pacman.x + dx
+    const ny = state.pacman.y + dy
+    if (isWall(state.grid, nx, ny)) return null
+    return { ...state, pacman: { x: nx, y: ny }, dir }
   }
-  return { ...state, pacman: { x: nx, y: ny }, dir }
+
+  const turned = tryDir(inputDir)
+  if (turned) return turned
+
+  // If turn blocked, try to continue in current direction
+  const continued = tryDir(state.dir)
+  if (continued) return continued
+
+  // Completely blocked; update facing to input even if not moving (so UI rotates)
+  return { ...state, dir: inputDir }
 }

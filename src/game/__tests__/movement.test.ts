@@ -5,22 +5,44 @@ import { TIMERS, Cell } from '../types'
 describe('Pacman movement and consumption', () => {
   it('moves into a pellet, increases score and decreases pelletsRemaining', () => {
     let s = initialState()
-    // The demo map places Pacman near pellets to the right
-    const before = { ...s.pacman }
-    s = step(s, 'right')
-    expect(s.pacman.x).toBe(before.x + 1)
-    expect(s.score).toBe(10)
-    expect(s.pelletsRemaining).toBeGreaterThan(0)
+
+    // Find a pellet with an open neighbor on its left so Pacman can move right into it
+    let placed = false
+    for (let y = 0; y < s.grid.length && !placed; y++) {
+      for (let x = 1; x < s.grid[0].length && !placed; x++) {
+        if (s.grid[y][x] === Cell.Pellet && s.grid[y][x - 1] !== Cell.Wall) {
+          s = { ...s, pacman: { x: x - 1, y } }
+          const before = { ...s.pacman }
+          const pelletsBefore = s.pelletsRemaining
+          s = step(s, 'right')
+          expect(s.pacman.x).toBe(before.x + 1)
+          expect(s.score).toBe(10)
+          expect(s.pelletsRemaining).toBeLessThan(pelletsBefore)
+          placed = true
+        }
+      }
+    }
+    expect(placed).toBe(true)
   })
 
   it('does not move through walls', () => {
     let s = initialState()
-    // Move left into a wall (spawn sits next to a wall in demo)
-    const before = { ...s.pacman }
-    s = step(s, 'left')
-    expect(s.pacman).toEqual(before)
-    // Score unchanged
-    expect(s.score).toBe(0)
+
+    // Place Pacman immediately to the right of a wall and attempt to move left
+    let placed = false
+    for (let y = 0; y < s.grid.length && !placed; y++) {
+      for (let x = 0; x < s.grid[0].length - 1 && !placed; x++) {
+        if (s.grid[y][x] === Cell.Wall && s.grid[y][x + 1] === Cell.Empty) {
+          s = { ...s, pacman: { x: x + 1, y } }
+          const before = { ...s.pacman }
+          s = step(s, 'left')
+          expect(s.pacman).toEqual(before)
+          expect(s.score).toBe(0)
+          placed = true
+        }
+      }
+    }
+    expect(placed).toBe(true)
   })
 
   it('power pellet grants more score and enables frightened mode', () => {

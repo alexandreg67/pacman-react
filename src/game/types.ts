@@ -19,10 +19,12 @@ export type GameState = {
   grid: Grid
   pacman: Vec
   dir: Direction
+  queuedDir?: Direction
   score: number
   lives: number
   pelletsRemaining: number
   frightenedTicks: number
+  tickCount: number
 }
 
 export const SCORES = {

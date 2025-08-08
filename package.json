@@ -14,6 +14,10 @@
     "test": "vitest",
     "test:run": "vitest run",
     "coverage": "vitest run --coverage",
+    "performance": "node scripts/performance-test.cjs",
+    "performance:quick": "node scripts/performance-test.cjs --duration 5000",
+    "demo": "node scripts/demo-optimizations.cjs",
+    "demo:report": "node scripts/demo-optimizations.cjs --report",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },
@@ -68,5 +72,6 @@
     "*.{json,md,css}": [
       "prettier --write"
     ]
-  }
+  },
+  "packageManager": "npm@10.8.2"
 }
