@@ -3,6 +3,7 @@ import type { Direction, GameState } from './types'
 import { Cell } from './types'
 import { attemptMove } from './entities/pacman'
 import { consumeIfAny } from './logic/scoring'
+import { stepGhosts } from './entities/ghosts'
 
 export function initialState(): GameState {
   // Load the classic-like map by default
@@ -71,6 +72,8 @@ export function step(state: GameState, inputDir?: Direction): GameState {
   }
 
   next = consumeIfAny(next)
+  // Phase 1: process ghosts movement (no-op if none)
+  next = stepGhosts(next)
   next = tick(next)
   return next
 }
