@@ -73,11 +73,15 @@ export function getTargetTileForGhost(state: GameState, ghost: Ghost): { x: numb
       }
     }
     case 'inky': {
-      // Approx: use blinky-like at first; refined in Phase 5 if needed
+      // Inky targets: 2 tiles ahead of Pac-Man, then vector from Blinky to that pivot doubled
       const { dx, dy } = dirToDelta(state.dir)
-      const px = state.pacman.x + dx * 2
-      const py = state.pacman.y + dy * 2
-      return { x: px, y: py }
+      const pivotX = state.pacman.x + dx * 2
+      const pivotY = state.pacman.y + dy * 2
+      const blinky = state.ghosts?.find((g) => g.id === 'blinky')
+      if (!blinky) return { x: pivotX, y: pivotY }
+      const vectorX = pivotX - blinky.pos.x
+      const vectorY = pivotY - blinky.pos.y
+      return { x: pivotX + vectorX, y: pivotY + vectorY }
     }
     case 'clyde': {
       const dx = state.pacman.x - ghost.pos.x

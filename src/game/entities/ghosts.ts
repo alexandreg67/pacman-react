@@ -62,6 +62,8 @@ function getPossibleDirections(state: GameState, ghost: Ghost): Direction[] {
     const { x: wrappedX } = handleHorizontalWrapForGhost(state, nx, ny)
     nx = wrappedX
 
+    // Decision strictly on tile centers: only choose turns when aligned on grid
+    // Our positions are tile-based integers already; this ensures classic behavior
     // vertical bounds (no vertical wrap in classic)
     if (ny < 0 || ny >= h) continue
     if (nx < 0 || nx >= w) continue
