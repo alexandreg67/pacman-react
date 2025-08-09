@@ -66,7 +66,7 @@ function handleHorizontalWrap(state: GameState, nx: number, ny: number): Horizon
  * @param ny Position Y calculée (peut être hors limites)
  * @returns Position Y ajustée ou null si le wrap n'est pas possible
  */
-function handleVerticalWrap(state: GameState, nx: number, ny: number): number | null {
+function handleVerticalWrap(state: GameState, _nx: number, ny: number): number | null {
   const h = state.grid.length
 
   // Pour le gameplay classique Pac-Man, pas de wrap vertical

@@ -125,12 +125,14 @@ const PacmanRenderer = React.memo(
     direction,
     tickCount,
     tileSize,
+    justWrapped = false,
   }: {
     x: number
     y: number
     direction: Direction
     tickCount: number
     tileSize: number
+    justWrapped?: boolean
   }) => (
     <div
       className="absolute pacman-container"
@@ -139,7 +141,8 @@ const PacmanRenderer = React.memo(
         width: tileSize,
         height: tileSize,
         zIndex: 100,
-        transition: 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+        // Désactiver la transition quand un wrap vient d'avoir lieu pour éviter l'effet fantôme
+        transition: justWrapped ? 'none' : 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
       aria-label="pacman"
     >
@@ -175,8 +178,9 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
       y: state.pacman.y,
       direction: state.dir,
       tickCount: state.tickCount,
+      justWrapped: state.justWrapped || false,
     }),
-    [state.pacman.x, state.pacman.y, state.dir, state.tickCount],
+    [state.pacman.x, state.pacman.y, state.dir, state.tickCount, state.justWrapped],
   )
 
   // Mémoriser l'éclairage ambiant
@@ -227,6 +231,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
           direction={pacmanPosition.direction}
           tickCount={pacmanPosition.tickCount}
           tileSize={tileSize}
+          justWrapped={pacmanPosition.justWrapped}
         />
 
         {/* Éclairage ambiant simplifié */}
