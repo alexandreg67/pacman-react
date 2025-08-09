@@ -58,17 +58,44 @@ export const Ghost = React.memo(
         aria-label={`ghost-${id}-${mode}`}
       >
         {!eyesOnly && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: bodyColor,
-              borderRadius: `${Math.floor(size * 0.5)}px ${Math.floor(size * 0.5)}px ${Math.floor(size * 0.15)}px ${Math.floor(size * 0.15)}px`,
-              boxShadow: frightened
-                ? '0 0 6px rgba(30, 144, 255, 0.6)'
-                : '0 2px 4px rgba(0,0,0,0.25)',
-            }}
-          />
+          <>
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundColor: bodyColor,
+                borderRadius: `${Math.floor(size * 0.5)}px ${Math.floor(size * 0.5)}px ${Math.floor(size * 0.15)}px ${Math.floor(size * 0.15)}px`,
+                boxShadow: frightened
+                  ? '0 0 6px rgba(30, 144, 255, 0.6)'
+                  : '0 2px 4px rgba(0,0,0,0.25)',
+              }}
+            />
+            {/* Fringe/feet */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: Math.max(3, Math.floor(size * 0.22)),
+              }}
+            >
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    bottom: -Math.floor(size * 0.05),
+                    left: Math.floor((i * size) / 4) + Math.floor(size * 0.02),
+                    width: Math.floor(size * 0.22),
+                    height: Math.floor(size * 0.22),
+                    backgroundColor: bodyColor,
+                    borderRadius: '9999px',
+                  }}
+                />
+              ))}
+            </div>
+          </>
         )}
         {/* Eyes */}
         <div
