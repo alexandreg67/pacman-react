@@ -3,6 +3,7 @@ import { isWall } from '../logic/collision'
 import { getCurrentGlobalMode } from '../logic/ghostModes'
 import { getTargetTileForGhost } from '../logic/ghostAi'
 import { shouldReleaseGhost } from '../logic/ghostHouse'
+import { getGhostStride } from '../logic/ghostSpeed'
 
 type Delta = { dx: number; dy: number }
 
@@ -116,6 +117,10 @@ export function stepGhosts(state: GameState): GameState {
   let scoreDelta = 0
   let frightChain = state.frightChain
   const updatedGhosts: Ghost[] = state.ghosts.map((ghost) => {
+    // Speed control: stride-based skipping
+    const stride = getGhostStride(state, ghost)
+    const shouldMoveThisTick = state.tickCount % stride === 0
+    if (!shouldMoveThisTick) return ghost
     // Release from pen if conditions met
     if (ghost.inPen && shouldReleaseGhost(state, ghost)) {
       ghost = { ...ghost, inPen: false }
