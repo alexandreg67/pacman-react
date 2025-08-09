@@ -15,6 +15,7 @@ export function consumeIfAny(state: GameState): GameState {
       grid: newGrid,
       score: state.score + SCORES.pellet,
       pelletsRemaining: Math.max(0, state.pelletsRemaining - 1),
+      dotsEaten: state.dotsEaten + 1,
     }
   }
   if (cell === Cell.PowerPellet) {
@@ -24,6 +25,7 @@ export function consumeIfAny(state: GameState): GameState {
       grid: newGrid,
       score: state.score + SCORES.powerPellet,
       pelletsRemaining: Math.max(0, state.pelletsRemaining - 1),
+      dotsEaten: state.dotsEaten + 1,
       frightenedTicks: TIMERS.frightenedDurationTicks,
     }
   }

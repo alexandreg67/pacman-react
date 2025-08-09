@@ -31,6 +31,10 @@ function scatterCornerFor(id: Ghost['id'], grid: GameState['grid']): { x: number
 }
 
 export function getTargetTileForGhost(state: GameState, ghost: Ghost): { x: number; y: number } {
+  // If still in pen, target the door to exit
+  if (ghost.inPen && ghost.mode !== 'eaten') {
+    return getHouseDoorTarget(state)
+  }
   // Mode eaten returns to house center (approx: map center). Refined in Phase 3.
   if (ghost.mode === 'eaten') {
     return getHouseDoorTarget(state)

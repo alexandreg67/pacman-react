@@ -118,6 +118,10 @@ export function step(state: GameState, inputDir?: Direction): GameState {
   }
 
   next = consumeIfAny(next)
+  // Reset fright chain when not frightened
+  if (next.frightenedTicks === 0 && next.frightChain !== 0) {
+    next = { ...next, frightChain: 0 }
+  }
   // Phase 1: process ghosts movement (no-op if none)
   next = stepGhosts(next)
   next = tick(next)

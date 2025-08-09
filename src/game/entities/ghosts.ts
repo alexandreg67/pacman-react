@@ -2,6 +2,7 @@ import type { Direction, GameState, Ghost } from '../types'
 import { isWall } from '../logic/collision'
 import { getCurrentGlobalMode } from '../logic/ghostModes'
 import { getTargetTileForGhost } from '../logic/ghostAi'
+import { shouldReleaseGhost } from '../logic/ghostHouse'
 
 type Delta = { dx: number; dy: number }
 
@@ -112,7 +113,13 @@ function chooseDirectionToward(
 export function stepGhosts(state: GameState): GameState {
   if (!state.ghosts || state.ghosts.length === 0) return state
 
+  let scoreDelta = 0
+  let frightChain = state.frightChain
   const updatedGhosts: Ghost[] = state.ghosts.map((ghost) => {
+    // Release from pen if conditions met
+    if (ghost.inPen && shouldReleaseGhost(state, ghost)) {
+      ghost = { ...ghost, inPen: false }
+    }
     // Phase 2: use per-ghost targeting based on modes
     const target = getTargetTileForGhost(state, ghost)
     const targetX = target.x
@@ -146,8 +153,30 @@ export function stepGhosts(state: GameState): GameState {
         }
       }
     }
+    // Collision with Pac-Man
+    if (finalX === state.pacman.x && finalY === state.pacman.y) {
+      if (state.frightenedTicks > 0 && ghost.mode !== 'eaten') {
+        // Eat ghost
+        const chainIdx = Math.min(frightChain, 3)
+        const chainScores = [200, 400, 800, 1600]
+        scoreDelta += chainScores[chainIdx]!
+        frightChain += 1
+        return {
+          ...moved,
+          mode: 'eaten',
+          eyesOnly: true,
+        }
+      } else {
+        // TODO: handle pacman death (future step)
+        return moved
+      }
+    }
+
     return moved
   })
 
+  if (scoreDelta !== 0 || frightChain !== state.frightChain) {
+    return { ...state, ghosts: updatedGhosts, score: state.score + scoreDelta, frightChain }
+  }
   return { ...state, ghosts: updatedGhosts }
 }

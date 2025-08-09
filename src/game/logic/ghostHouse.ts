@@ -6,10 +6,11 @@ export function isGhostInPen(ghost: Ghost): boolean {
 }
 
 export function shouldReleaseGhost(state: GameState, ghost: Ghost): boolean {
-  // Touch params to satisfy lint while remaining Phase 0 no-op
-  void state
-  void ghost
-  return false
+  // Simplified release: blinky always out; others when some dots eaten
+  if (ghost.id === 'blinky') return true
+  const thresholds = { pinky: 0, inky: 30, clyde: 60 } as const
+  const limit = thresholds[ghost.id] ?? 0
+  return state.dotsEaten >= limit
 }
 
 export function getHouseDoorTarget(state: GameState): { x: number; y: number } {
