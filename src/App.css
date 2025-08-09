@@ -171,6 +171,45 @@ kbd {
   backface-visibility: hidden;
 }
 
+/* ===== GHOST VISUALS ===== */
+.ghost-body {
+  will-change: transform, filter;
+}
+
+@keyframes ghost-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Apply gentle bobbing only when not prefers-reduced-motion */
+@media (prefers-reduced-motion: no-preference) {
+  .ghost-body {
+    animation: ghost-bob 0.8s ease-in-out infinite;
+  }
+}
+
+/* Frightened flashing enhancement */
+@keyframes ghost-flash {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(1.3) saturate(1.2);
+  }
+}
+
+.ghost-frightened.ghost-flash {
+  animation:
+    ghost-bob 0.8s ease-in-out infinite,
+    ghost-flash 0.4s steps(2, end) infinite;
+}
+
 /* Désactiver les transitions coûteuses sur mobile */
 @media (max-width: 768px) {
   .pacman-container {
