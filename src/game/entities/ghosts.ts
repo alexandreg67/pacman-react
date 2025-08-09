@@ -123,7 +123,16 @@ export function stepGhosts(state: GameState): GameState {
     if (!shouldMoveThisTick) return ghost
     // Release from pen if conditions met
     if (ghost.inPen && shouldReleaseGhost(state, ghost)) {
-      ghost = { ...ghost, inPen: false }
+      // Kick ghost one tile upward toward the door when releasing if possible
+      const door = getTargetTileForGhost(state, ghost)
+      const dy = ghost.pos.y > door.y ? -1 : 0
+      const nx = ghost.pos.x
+      const ny = ghost.pos.y + dy
+      if (!isWall(state.grid, nx, ny)) {
+        ghost = { ...ghost, inPen: false, pos: { x: nx, y: ny }, dir: dy < 0 ? 'up' : ghost.dir }
+      } else {
+        ghost = { ...ghost, inPen: false }
+      }
     }
     // Phase 2: use per-ghost targeting based on modes
     const target = getTargetTileForGhost(state, ghost)
