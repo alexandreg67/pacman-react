@@ -65,11 +65,11 @@ export function getTargetTileForGhost(state: GameState, ghost: Ghost): { x: numb
     case 'pinky': {
       const ahead = 4
       const { dx, dy } = dirToDelta(state.dir)
-      // Pinky bug: when facing up, classic targets up-left by 4
+      // Pinky bug: when facing up, classic targets up-left by 4 (x-4)
       const bugDx = state.dir === 'up' ? -4 : 0
       return {
         x: state.pacman.x + dx * ahead + bugDx,
-        y: state.pacman.y + dy * ahead + (state.dir === 'up' ? -4 : 0),
+        y: state.pacman.y + dy * ahead,
       }
     }
     case 'inky': {
