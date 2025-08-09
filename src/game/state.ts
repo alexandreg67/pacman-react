@@ -32,7 +32,13 @@ export function initialState(): GameState {
 export function tick(state: GameState): GameState {
   // Decay frightened timer if active
   const frightenedTicks = Math.max(0, state.frightenedTicks - 1)
-  return { ...state, frightenedTicks, tickCount: state.tickCount + 1 }
+  return {
+    ...state,
+    frightenedTicks,
+    tickCount: state.tickCount + 1,
+    // Réinitialiser le flag justWrapped après un tick
+    justWrapped: false,
+  }
 }
 
 export function step(state: GameState, inputDir?: Direction): GameState {

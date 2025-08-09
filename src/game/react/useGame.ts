@@ -4,9 +4,8 @@ import { initialState, step } from '../state'
 
 // Vitesse fidèle à l'arcade
 function getPacmanSpeedMs(state: GameState): number {
-  // Tunnel: vitesse réduite
-  const tunnelRows = [11, 15, 17] // lignes approximatives du tunnel classique
-  const inTunnel = tunnelRows.includes(state.pacman.y)
+  // Tunnel: vitesse réduite (utilise la détection dynamique)
+  const inTunnel = state.tunnelRows.includes(state.pacman.y)
   if (inTunnel) return 90
   // Niveau 1 à 4 : 80ms, niveau 5+ : 60ms
   const level = Math.floor((state.score || 0) / 10000) + 1 // estimation simple
@@ -71,11 +70,7 @@ export function useGame() {
         timing.frameCount = 0
         timing.lastFpsUpdate = currentTime
 
-        // Debug FPS en développement
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.debug(`Game FPS: ${timing.fps}`)
-        }
+        // FPS calculé et disponible via le retour du hook en développement
       }
 
       // Programmer le prochain frame

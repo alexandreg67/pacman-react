@@ -26,6 +26,7 @@ export type GameState = {
   frightenedTicks: number
   tickCount: number
   tunnelRows: number[]
+  justWrapped?: boolean // Indique qu'un wrap vient d'avoir lieu (pour optimisations UI)
   // Future: tunnelCols: number[] pour le wrap vertical
 }
 

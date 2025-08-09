@@ -15,6 +15,11 @@ export function dirToDelta(dir: Direction): { dx: number; dy: number } {
 }
 
 /**
+ * Résultat du wrap horizontal avec information sur le wrapping
+ */
+type HorizontalWrapResult = { x: number; wrapped: boolean }
+
+/**
  * Gère le wrap horizontal (tunnel gauche-droite) avec détection dynamique.
  * Utilise les tunnels détectés automatiquement par computeTunnelRows() pour
  * déterminer si Pac-Man peut traverser d'un côté à l'autre de l'écran.
@@ -27,29 +32,29 @@ export function dirToDelta(dir: Direction): { dx: number; dy: number } {
  * @param state L'état actuel du jeu (contient tunnelRows calculés dynamiquement)
  * @param nx Position X calculée (peut être hors limites)
  * @param ny Position Y
- * @returns Position X ajustée ou null si le wrap n'est pas possible
+ * @returns Un objet contenant la position X ajustée et un booléen indiquant si le wrap a eu lieu
  */
-function handleHorizontalWrap(state: GameState, nx: number, ny: number): number | null {
+function handleHorizontalWrap(state: GameState, nx: number, ny: number): HorizontalWrapResult {
   const w = state.grid[0]?.length ?? 0
 
   // Vérifier si on est sur une ligne de tunnel (détectée dynamiquement)
   if (!state.tunnelRows.includes(ny)) {
-    return nx // Pas de wrap sur cette ligne
+    return { x: nx, wrapped: false } // Pas de wrap sur cette ligne
   }
 
   if (nx < 0) {
     // Tentative de sortie par la gauche -> wrap à droite si possible
     if (!isWall(state.grid, w - 1, ny)) {
-      return w - 1
+      return { x: w - 1, wrapped: true }
     }
   } else if (nx >= w) {
     // Tentative de sortie par la droite -> wrap à gauche si possible
     if (!isWall(state.grid, 0, ny)) {
-      return 0
+      return { x: 0, wrapped: true }
     }
   }
 
-  return nx // Position normale ou wrap impossible
+  return { x: nx, wrapped: false } // Position normale ou wrap impossible
 }
 
 /**
@@ -84,8 +89,7 @@ export function attemptMove(state: GameState, inputDir: Direction): GameState {
     const rawY = state.pacman.y + dy
 
     // Gestion du wrap horizontal (tunnels gauche-droite)
-    const wrappedX = handleHorizontalWrap(state, rawX, rawY)
-    if (wrappedX === null) return null
+    const { x: wrappedX, wrapped } = handleHorizontalWrap(state, rawX, rawY)
 
     // Gestion du wrap vertical (pour future extension)
     const wrappedY = handleVerticalWrap(state, wrappedX, rawY)
@@ -97,7 +101,9 @@ export function attemptMove(state: GameState, inputDir: Direction): GameState {
     // Vérification finale des collisions
     if (isWall(state.grid, finalX, finalY)) return null
 
-    return { ...state, pacman: { x: finalX, y: finalY }, dir }
+    // Retourner le nouvel état avec info de wrap si nécessaire
+    // Le flag 'wrapped' pourra être utilisé plus tard pour désactiver les transitions CSS
+    return { ...state, pacman: { x: finalX, y: finalY }, dir, justWrapped: wrapped }
   }
 
   const turned = tryDir(inputDir)

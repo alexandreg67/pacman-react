@@ -49,7 +49,7 @@ export default defineConfig({
     },
     // Optimisations de performance
     cssCodeSplit: true,
-    sourcemap: false, // Désactivé en production pour la taille
+    sourcemap: 'hidden', // Génère les sourcemaps sans les exposer aux utilisateurs
     minify: 'terser',
     terserOptions: {
       compress: {

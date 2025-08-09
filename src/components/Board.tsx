@@ -31,6 +31,19 @@ interface WallStyle {
 
 // Cache pour les styles de murs - réutilisé entre les rendus
 const wallStyleCache = new Map<string, WallStyle>()
+const WALL_STYLE_CACHE_MAX_SIZE = 1000
+
+// Fonction pour nettoyer le cache si nécessaire
+function cleanCacheIfNeeded() {
+  if (wallStyleCache.size > WALL_STYLE_CACHE_MAX_SIZE) {
+    // Garder seulement les 500 dernières entrées (stratégie LRU simplifiée)
+    const entries = Array.from(wallStyleCache.entries())
+    wallStyleCache.clear()
+    entries.slice(-500).forEach(([key, value]) => {
+      wallStyleCache.set(key, value)
+    })
+  }
+}
 
 function getWallNeighbors(grid: Cell[][], x: number, y: number): WallNeighbors {
   return {
@@ -80,7 +93,8 @@ function generateWallStyle(neighbors: WallNeighbors, tileSize: number): WallStyl
     marginLeft: left ? '-1px' : '0',
   }
 
-  // Mettre en cache le style calculé
+  // Mettre en cache le style calculé avec gestion de la limite
+  cleanCacheIfNeeded()
   wallStyleCache.set(cacheKey, style)
   return style
 }
