@@ -131,11 +131,10 @@ function App() {
 
   // Gestion optimisée des événements clavier
   useEffect(() => {
-    // Options d'événement optimisées
-    const options: AddEventListenerOptions = { passive: false }
-    window.addEventListener('keydown', handleKeyDown, options)
+    // Pas de passive: false car on appelle preventDefault() conditionnellement
+    window.addEventListener('keydown', handleKeyDown)
 
-    return () => window.removeEventListener('keydown', handleKeyDown, options)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
   // Mémorisation des props du Board pour éviter les re-rendus

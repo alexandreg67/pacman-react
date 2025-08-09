@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface PerformanceMetrics {
   fps: number
@@ -28,7 +28,7 @@ const DEFAULT_CONFIG: Required<PerformanceConfig> = {
 }
 
 export function usePerformance(config: PerformanceConfig = {}) {
-  const finalConfig = { ...DEFAULT_CONFIG, ...config }
+  const finalConfig = useMemo(() => ({ ...DEFAULT_CONFIG, ...config }), [config])
 
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     fps: 0,
@@ -77,11 +77,21 @@ export function usePerformance(config: PerformanceConfig = {}) {
         // Détection de lag
         const isLaggy = fps < finalConfig.lagThreshold
 
-        // Mesure mémoire si disponible
+        // Mesure mémoire si disponible (with robust feature detection)
         let memoryUsage: number | undefined
-        if (finalConfig.trackMemory && 'memory' in performance) {
-          const memory = (performance as { memory: { usedJSHeapSize: number } }).memory
-          memoryUsage = Math.round((memory.usedJSHeapSize / 1024 / 1024) * 100) / 100
+        if (
+          finalConfig.trackMemory &&
+          typeof (performance as unknown as { memory?: { usedJSHeapSize?: number } }).memory
+            ?.usedJSHeapSize === 'number'
+        ) {
+          memoryUsage =
+            Math.round(
+              ((performance as unknown as { memory: { usedJSHeapSize: number } }).memory
+                .usedJSHeapSize /
+                1024 /
+                1024) *
+                100,
+            ) / 100
         }
 
         setMetrics({
@@ -116,16 +126,23 @@ export function usePerformance(config: PerformanceConfig = {}) {
     }
   }, [measurePerformance, finalConfig.trackFPS])
 
-  // Fonction pour logger les performances
+  // Fonction pour logger les performances (développement seulement)
   const logMetrics = useCallback(() => {
+    // eslint-disable-next-line no-console
     console.group('🎮 Performance Metrics')
+    // eslint-disable-next-line no-console
     console.log(`FPS: ${metrics.fps} (Average: ${metrics.averageFPS})`)
+    // eslint-disable-next-line no-console
     console.log(`Frame Time: ${metrics.frameTime}ms`)
+    // eslint-disable-next-line no-console
     console.log(`Renders: ${metrics.renderCount}`)
     if (metrics.memoryUsage) {
+      // eslint-disable-next-line no-console
       console.log(`Memory: ${metrics.memoryUsage}MB`)
     }
+    // eslint-disable-next-line no-console
     console.log(`Status: ${metrics.isLaggy ? '🐌 Laggy' : '⚡ Smooth'}`)
+    // eslint-disable-next-line no-console
     console.groupEnd()
   }, [metrics])
 

@@ -25,6 +25,7 @@ interface GameTiming {
 export function useGame() {
   const [state, setState] = useState<GameState>(() => initialState())
   const animationFrameRef = useRef<number>(0)
+  const stateRef = useRef<GameState>(state) // Ref pour accès au state sans dependency
   const timingRef = useRef<GameTiming>({
     lastTime: 0,
     accumulator: 0,
@@ -35,6 +36,11 @@ export function useGame() {
 
   // Flag pour éviter les updates pendant les transitions
   const isRunningRef = useRef(true)
+
+  // Synchroniser le state ref
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   // Game loop optimisé avec requestAnimationFrame
   const gameLoop = useCallback(
@@ -54,7 +60,7 @@ export function useGame() {
       timing.accumulator += deltaTime
 
       // Vitesse variable selon le niveau et la position
-      const pacmanSpeedMs = getPacmanSpeedMs(state)
+      const pacmanSpeedMs = getPacmanSpeedMs(stateRef.current)
 
       let stepsThisFrame = 0
       while (timing.accumulator >= pacmanSpeedMs && stepsThisFrame < 3) {
@@ -76,7 +82,7 @@ export function useGame() {
       // Programmer le prochain frame
       animationFrameRef.current = requestAnimationFrame(gameLoop)
     },
-    [state],
+    [], // Pas de dépendances - utilise stateRef pour éviter les re-créations
   )
 
   // Démarrer le game loop

@@ -101,8 +101,7 @@ export function attemptMove(state: GameState, inputDir: Direction): GameState {
     // Vérification finale des collisions
     if (isWall(state.grid, finalX, finalY)) return null
 
-    // Retourner le nouvel état avec info de wrap si nécessaire
-    // Le flag 'wrapped' pourra être utilisé plus tard pour désactiver les transitions CSS
+    // Retourner le nouvel état avec info de wrap pour optimisations UI
     return { ...state, pacman: { x: finalX, y: finalY }, dir, justWrapped: wrapped }
   }
 
