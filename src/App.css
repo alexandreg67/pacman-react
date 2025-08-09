@@ -1,42 +1,187 @@
+/* CSS Optimisé pour Performance - Pacman Game */
+
+/* Variables de base simplifiées */
+:root {
+  --wall-color: #2563eb;
+  --wall-border: #1e40af;
+  --path-color: #000000;
+  --pellet-color: #fbbf24;
+  --power-pellet-color: #f59e0b;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* ===== SYSTÈME DE MURS OPTIMISÉ ===== */
+
+.maze-container {
+  contain: layout style paint;
+  overflow: hidden;
+  /* Optimisation GPU */
+  will-change: auto;
+  transform: translateZ(0);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.wall-segment {
+  background: var(--wall-color);
+  border: 1px solid var(--wall-border);
+  position: relative;
+
+  /* Optimisation GPU forcée */
+  transform: translateZ(0);
+  will-change: auto;
+
+  /* Shadow simple mais efficace */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== CHEMINS ET PELLETS OPTIMISÉS ===== */
+
+.path-segment {
+  background: var(--path-color);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Optimisation containment */
+  contain: layout style;
+}
+
+.pellet-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--pellet-color);
+  box-shadow: 0 0 4px rgba(251, 191, 36, 0.6);
+  /* Optimisation GPU */
+  transform: translateZ(0);
+}
+
+.power-pellet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--power-pellet-color) 70%);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  /* Animation simple */
+  animation: power-pellet-pulse 1s ease-in-out infinite;
+  /* Optimisation GPU */
+  transform: translateZ(0);
+}
+
+@keyframes power-pellet-pulse {
+  0%,
+  100% {
+    transform: scale(1) translateZ(0);
+    opacity: 1;
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.1) translateZ(0);
+    opacity: 0.8;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+/* ===== PACMAN OPTIMISÉ ===== */
+
+.pacman-container {
+  /* Optimisation GPU pour les animations de position */
+  will-change: transform;
+  transform: translateZ(0);
+  /* Shadow simple */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* ===== RESPONSIVE DESIGN SIMPLIFIÉ ===== */
+
+@media (max-width: 768px) {
+  .wall-segment {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .pellet-dot {
+    width: 3px;
+    height: 3px;
+  }
+
+  .power-pellet {
+    width: 9px;
+    height: 9px;
   }
 }
 
-.card {
-  padding: 2em;
+/* ===== ACCESSIBILITÉ ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .power-pellet {
+    animation: none !important;
+  }
+
+  .pacman-container {
+    transition: none !important;
+  }
 }
 
-.read-the-docs {
-  color: #888;
+@media (prefers-contrast: high) {
+  :root {
+    --wall-color: #0066ff;
+    --wall-border: #ffffff;
+  }
+
+  .wall-segment {
+    border: 2px solid #ffffff;
+  }
+
+  .pellet-dot,
+  .power-pellet {
+    border: 1px solid #ffffff;
+  }
+}
+
+/* ===== STYLES D'INTERACTION ===== */
+
+kbd {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+  border: 1px solid #4a5568;
+  border-bottom: 2px solid #2d3748;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* ===== OPTIMISATIONS DE PERFORMANCE GLOBALES ===== */
+
+/* Containment pour tous les éléments de jeu */
+.maze-container,
+.wall-segment,
+.path-segment,
+.pacman-container {
+  contain: layout style paint;
+}
+
+/* Optimisation GPU pour les éléments animés */
+.pacman-container,
+.power-pellet {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Désactiver les transitions coûteuses sur mobile */
+@media (max-width: 768px) {
+  .pacman-container {
+    transition-duration: 30ms !important;
+  }
+}
+
+/* Optimisation pour les écrans haute densité */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .wall-segment {
+    /* Borders plus fins sur les écrans Retina pour éviter le flou */
+    border-width: 0.5px;
+  }
 }
