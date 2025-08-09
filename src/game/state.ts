@@ -36,13 +36,14 @@ export function tick(state: GameState): GameState {
     ...state,
     frightenedTicks,
     tickCount: state.tickCount + 1,
-    // Réinitialiser le flag justWrapped après un tick
-    justWrapped: false,
   }
 }
 
 export function step(state: GameState, inputDir?: Direction): GameState {
   let next: GameState = state
+
+  // Réinitialiser justWrapped du step précédent
+  next = { ...next, justWrapped: false }
 
   // Buffer desired direction
   if (typeof inputDir !== 'undefined') {
