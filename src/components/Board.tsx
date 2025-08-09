@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
+import { Ghost } from './Ghost'
 
 type Props = {
   state: GameState
@@ -233,6 +234,32 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
           tileSize={tileSize}
           justWrapped={pacmanPosition.justWrapped}
         />
+
+        {/* Ghosts (Phase 4 rendering) */}
+        {state.ghosts?.map((g) => (
+          <div
+            key={`ghost-${g.id}`}
+            className="absolute"
+            style={{
+              transform: `translate(${g.pos.x * tileSize}px, ${g.pos.y * tileSize}px)`,
+              width: tileSize,
+              height: tileSize,
+              zIndex: 90,
+              transition: g.justWrapped ? 'none' : 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+            }}
+            aria-label={`ghost-${g.id}`}
+          >
+            <Ghost
+              size={tileSize}
+              id={g.id}
+              direction={g.dir}
+              mode={g.mode}
+              eyesOnly={g.eyesOnly}
+              frightened={state.frightenedTicks > 0 && g.mode !== 'eaten'}
+              flash={state.frightenedTicks > 0 && state.frightenedTicks < 10}
+            />
+          </div>
+        ))}
 
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
