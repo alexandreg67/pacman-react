@@ -1,5 +1,6 @@
 import type { Direction, GameState, Ghost } from '../types'
 import { isWall } from '../logic/collision'
+import { getCurrentGlobalMode } from '../logic/ghostModes'
 import { getTargetTileForGhost } from '../logic/ghostAi'
 
 type Delta = { dx: number; dy: number }
@@ -127,12 +128,25 @@ export function stepGhosts(state: GameState): GameState {
     const finalX = wrappedX
     const finalY = rawY
     if (isWall(state.grid, finalX, finalY)) return ghost
-    return {
+    const moved: Ghost = {
       ...ghost,
       pos: { x: finalX, y: finalY },
       dir: nextDir,
       justWrapped: wrapped,
     }
+    // If eyes (eaten) reached house target, respawn
+    if (ghost.mode === 'eaten') {
+      const target = getTargetTileForGhost(state, ghost)
+      if (finalX === target.x && finalY === target.y) {
+        return {
+          ...moved,
+          mode: getCurrentGlobalMode(state),
+          eyesOnly: false,
+          inPen: true,
+        }
+      }
+    }
+    return moved
   })
 
   return { ...state, ghosts: updatedGhosts }

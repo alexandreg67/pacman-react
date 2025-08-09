@@ -1,5 +1,6 @@
 import type { Direction, GameState, Ghost } from '../types'
 import { getCurrentGlobalMode } from './ghostModes'
+import { getHouseDoorTarget } from './ghostHouse'
 
 function dirToDelta(dir: Direction): { dx: number; dy: number } {
   switch (dir) {
@@ -32,9 +33,7 @@ function scatterCornerFor(id: Ghost['id'], grid: GameState['grid']): { x: number
 export function getTargetTileForGhost(state: GameState, ghost: Ghost): { x: number; y: number } {
   // Mode eaten returns to house center (approx: map center). Refined in Phase 3.
   if (ghost.mode === 'eaten') {
-    const h = state.grid.length
-    const w = state.grid[0]?.length ?? 0
-    return { x: Math.floor(w / 2), y: Math.floor(h / 2) }
+    return getHouseDoorTarget(state)
   }
 
   const globalMode = getCurrentGlobalMode(state)

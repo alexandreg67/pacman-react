@@ -11,3 +11,10 @@ export function shouldReleaseGhost(state: GameState, ghost: Ghost): boolean {
   void ghost
   return false
 }
+
+export function getHouseDoorTarget(state: GameState): { x: number; y: number } {
+  const h = state.grid.length
+  const w = state.grid[0]?.length ?? 0
+  // Approximate center as door; can be refined to actual door cell later
+  return { x: Math.floor(w / 2), y: Math.floor(h / 2) }
+}
