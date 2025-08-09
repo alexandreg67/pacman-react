@@ -19,10 +19,15 @@ export type GameState = {
   grid: Grid
   pacman: Vec
   dir: Direction
+  queuedDir?: Direction
   score: number
   lives: number
   pelletsRemaining: number
   frightenedTicks: number
+  tickCount: number
+  tunnelRows: number[]
+  justWrapped?: boolean // Indique qu'un wrap vient d'avoir lieu (pour optimisations UI)
+  // Future: tunnelCols: number[] pour le wrap vertical
 }
 
 export const SCORES = {
