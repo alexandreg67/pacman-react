@@ -26,6 +26,14 @@ export function initialState(): GameState {
     frightenedTicks: 0,
     tickCount: 0,
     tunnelRows,
+    // Ghost system (Phase 0 defaults)
+    ghosts: [],
+    level: 1,
+    globalModeIndex: 0,
+    globalModeTicksRemaining: 0,
+    frightChain: 0,
+    dotsEaten: 0,
+    elroy: { phase: 0 },
   }
 }
 

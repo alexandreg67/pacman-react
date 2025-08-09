@@ -15,6 +15,22 @@ export type SpawnInfo = {
   pacman: Vec
 }
 
+// Ghost system types (Phase 0)
+export type GhostId = 'blinky' | 'pinky' | 'inky' | 'clyde'
+export type GhostMode = 'scatter' | 'chase' | 'frightened' | 'eaten'
+
+export type Ghost = {
+  id: GhostId
+  pos: Vec
+  dir: Direction
+  mode: GhostMode
+  inPen: boolean
+  dotCounter: number
+  eyesOnly: boolean
+  frightenedFlash: boolean
+  justWrapped?: boolean
+}
+
 export type GameState = {
   grid: Grid
   pacman: Vec
@@ -28,6 +44,14 @@ export type GameState = {
   tunnelRows: number[]
   justWrapped?: boolean // Indique qu'un wrap vient d'avoir lieu (pour optimisations UI)
   // Future: tunnelCols: number[] pour le wrap vertical
+  // Ghost system (added in Phase 0; not yet used for gameplay)
+  ghosts: Ghost[]
+  level: number
+  globalModeIndex: number
+  globalModeTicksRemaining: number
+  frightChain: number
+  dotsEaten: number
+  elroy: { phase: 0 | 1 | 2 }
 }
 
 export const SCORES = {
