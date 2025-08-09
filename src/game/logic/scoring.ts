@@ -1,4 +1,5 @@
 import { Cell, SCORES, TIMERS } from '../types'
+import { getFrightenedDurationTicks } from './ghostSpeed'
 import type { GameState } from '../types'
 
 function updateGridAt(grid: Array<Array<Cell>>, x: number, y: number, newValue: Cell) {
@@ -26,7 +27,7 @@ export function consumeIfAny(state: GameState): GameState {
       score: state.score + SCORES.powerPellet,
       pelletsRemaining: Math.max(0, state.pelletsRemaining - 1),
       dotsEaten: state.dotsEaten + 1,
-      frightenedTicks: TIMERS.frightenedDurationTicks,
+      frightenedTicks: getFrightenedDurationTicks(state.level) || TIMERS.frightenedDurationTicks,
     }
   }
   return state

@@ -1,4 +1,5 @@
 import type { GameState, Ghost } from '../types'
+import { getReleaseThresholds } from './ghostSpeed'
 
 // Phase 0: placeholders for pen and release logic
 export function isGhostInPen(ghost: Ghost): boolean {
@@ -8,8 +9,8 @@ export function isGhostInPen(ghost: Ghost): boolean {
 export function shouldReleaseGhost(state: GameState, ghost: Ghost): boolean {
   // Simplified release: blinky always out; others when some dots eaten
   if (ghost.id === 'blinky') return true
-  const thresholds = { pinky: 0, inky: 30, clyde: 15 } as const
-  const limit = thresholds[ghost.id] ?? 0
+  const t = getReleaseThresholds(state.level)
+  const limit = (ghost.id === 'inky' ? t.inky : ghost.id === 'clyde' ? t.clyde : t.pinky) ?? 0
   return state.dotsEaten >= limit
 }
 
