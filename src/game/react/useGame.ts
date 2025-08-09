@@ -1,25 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Direction, GameState } from '../types'
 import { initialState, step } from '../state'
-import { getPacmanStepMs } from '../logic/ghostSpeed'
-
 // Vitesse fidèle à l'arcade
-function getPacmanSpeedMs(state: GameState): number {
-  return getPacmanStepMs(state)
-}
-
-const MAX_DELTA = 100 // Limite pour éviter les gros sauts
-
-interface GameTiming {
-  lastTime: number
-  accumulator: number
-  frameCount: number
-  fps: number
-  lastFpsUpdate: number
-}
-
-// Vitesse fidèle à l'arcade
-function getPacmanSpeedMs(state: GameState): number {
+function getPacmanSpeedMs(state: import('../types').GameState): number {
   // Tunnel: vitesse réduite (utilise la détection dynamique)
   const inTunnel = state.tunnelRows.includes(state.pacman.y)
   if (inTunnel) return 90
@@ -37,6 +20,10 @@ interface GameTiming {
   fps: number
   lastFpsUpdate: number
 }
+// ...existing code...
+
+// Vitesse fidèle à l'arcade
+// ...existing code...
 
 export function useGame() {
   const [state, setState] = useState<GameState>(() => initialState())
