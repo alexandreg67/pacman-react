@@ -18,6 +18,26 @@ interface GameTiming {
   lastFpsUpdate: number
 }
 
+// Vitesse fidèle à l'arcade
+function getPacmanSpeedMs(state: GameState): number {
+  // Tunnel: vitesse réduite (utilise la détection dynamique)
+  const inTunnel = state.tunnelRows.includes(state.pacman.y)
+  if (inTunnel) return 90
+  // Niveau 1 à 4 : 80ms, niveau 5+ : 60ms
+  const level = Math.floor((state.score || 0) / 10000) + 1 // estimation simple
+  return level < 5 ? 80 : 60
+}
+
+const MAX_DELTA = 100 // Limite pour éviter les gros sauts
+
+interface GameTiming {
+  lastTime: number
+  accumulator: number
+  frameCount: number
+  fps: number
+  lastFpsUpdate: number
+}
+
 export function useGame() {
   const [state, setState] = useState<GameState>(() => initialState())
   const animationFrameRef = useRef<number>(0)
