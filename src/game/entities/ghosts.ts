@@ -1,5 +1,6 @@
 import type { Direction, GameState, Ghost } from '../types'
 import { isWall } from '../logic/collision'
+import { getTargetTileForGhost } from '../logic/ghostAi'
 
 type Delta = { dx: number; dy: number }
 
@@ -111,9 +112,10 @@ export function stepGhosts(state: GameState): GameState {
   if (!state.ghosts || state.ghosts.length === 0) return state
 
   const updatedGhosts: Ghost[] = state.ghosts.map((ghost) => {
-    // For Phase 1, simple chasing Pac-Man tile
-    const targetX = state.pacman.x
-    const targetY = state.pacman.y
+    // Phase 2: use per-ghost targeting based on modes
+    const target = getTargetTileForGhost(state, ghost)
+    const targetX = target.x
+    const targetY = target.y
     const options = getPossibleDirections(state, ghost)
     const nextDir = chooseDirectionToward(state, ghost, targetX, targetY, options)
     if (!nextDir) return ghost

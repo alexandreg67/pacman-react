@@ -4,6 +4,7 @@ import { Cell } from './types'
 import { attemptMove } from './entities/pacman'
 import { consumeIfAny } from './logic/scoring'
 import { stepGhosts } from './entities/ghosts'
+import { advanceGlobalModeTimer, getModeSchedule } from './logic/ghostModes'
 
 export function initialState(): GameState {
   // Load the classic-like map by default
@@ -31,7 +32,7 @@ export function initialState(): GameState {
     ghosts: [],
     level: 1,
     globalModeIndex: 0,
-    globalModeTicksRemaining: 0,
+    globalModeTicksRemaining: getModeSchedule(1)[0]!.durationTicks,
     frightChain: 0,
     dotsEaten: 0,
     elroy: { phase: 0 },
@@ -39,11 +40,15 @@ export function initialState(): GameState {
 }
 
 export function tick(state: GameState): GameState {
+  // Global mode timer
+  const { index, ticksRemaining } = advanceGlobalModeTimer(state)
   // Decay frightened timer if active
   const frightenedTicks = Math.max(0, state.frightenedTicks - 1)
   return {
     ...state,
     frightenedTicks,
+    globalModeIndex: index,
+    globalModeTicksRemaining: ticksRemaining,
     tickCount: state.tickCount + 1,
   }
 }
