@@ -1,5 +1,6 @@
 import { Cell } from '../types'
 import type { Grid } from '../types'
+import { HOUSE_BOUNDS } from './ghostHouse'
 
 export function inBounds(grid: Grid, x: number, y: number): boolean {
   if (grid.length === 0) return false
@@ -42,11 +43,15 @@ export function isGhostBlocked(
 
   // Pour les GhostDoor : permettre aux fantômes de sortir de la maison mais pas d'y entrer
   if (cell === Cell.GhostDoor) {
-    // Vérifier si le fantôme est dans la zone de la maison (y >= 12 et y <= 16 environ)
+    // Vérifier si le fantôme est dans la zone de la maison
     // Si oui, il peut passer la porte pour sortir
     // Si non, il ne peut pas passer la porte pour entrer
     if (ghostX !== undefined && ghostY !== undefined) {
-      const isInsideHouse = ghostY >= 12 && ghostY <= 16 && ghostX >= 10 && ghostX <= 17
+      const isInsideHouse =
+        ghostY >= HOUSE_BOUNDS.TOP &&
+        ghostY <= HOUSE_BOUNDS.BOTTOM &&
+        ghostX >= HOUSE_BOUNDS.LEFT &&
+        ghostX <= HOUSE_BOUNDS.RIGHT
       return !isInsideHouse
     }
     // Si on n'a pas les coordonnées, bloquer par sécurité

@@ -5,6 +5,7 @@ import { attemptMove } from './entities/pacman'
 import { consumeIfAny } from './logic/scoring'
 import { stepGhosts } from './entities/ghosts'
 import { advanceGlobalModeTimer, getModeSchedule } from './logic/ghostModes'
+import { INITIAL_GHOST_POSITIONS } from './logic/ghostHouse'
 
 export function initialState(): GameState {
   // Load the classic-like map by default
@@ -33,48 +34,19 @@ export function initialState(): GameState {
     started: false,
     respawnProtectionTicks: 0, // Ajout de la propriété manquante
     // Ghost system (Phase 0 defaults)
-    ghosts: [
-      {
-        id: 'blinky',
-        pos: { x: 13, y: 9 },
-        dir: 'left',
+    ghosts: INITIAL_GHOST_POSITIONS.map((pos, index) => {
+      const ghostIds = ['blinky', 'pinky', 'inky', 'clyde'] as const
+      return {
+        id: ghostIds[index]!,
+        pos: { x: pos.x, y: pos.y },
+        dir: index === 0 ? 'left' : 'up',
         mode: 'scatter',
-        inPen: false,
+        inPen: pos.inPen,
         dotCounter: 0,
         eyesOnly: false,
         frightenedFlash: false,
-      },
-      {
-        id: 'pinky',
-        pos: { x: 13, y: 14 },
-        dir: 'up',
-        mode: 'scatter',
-        inPen: true,
-        dotCounter: 0,
-        eyesOnly: false,
-        frightenedFlash: false,
-      },
-      {
-        id: 'inky',
-        pos: { x: 11, y: 14 },
-        dir: 'up',
-        mode: 'scatter',
-        inPen: true,
-        dotCounter: 0,
-        eyesOnly: false,
-        frightenedFlash: false,
-      },
-      {
-        id: 'clyde',
-        pos: { x: 15, y: 14 },
-        dir: 'up',
-        mode: 'scatter',
-        inPen: true,
-        dotCounter: 0,
-        eyesOnly: false,
-        frightenedFlash: false,
-      },
-    ],
+      }
+    }),
     level: 1,
     globalModeIndex: 0,
     globalModeTicksRemaining: getModeSchedule(1)[0]!.durationTicks,
@@ -111,18 +83,13 @@ export function handlePacmanDeath(state: GameState): GameState {
     respawnProtectionTicks: 60, // 2 secondes d'invincibilité post-respawn (à ajuster)
     // Remettre les fantômes à leurs positions initiales
     ghosts: state.ghosts.map((ghost, index) => {
-      const initialPositions = [
-        { x: 13, y: 9, inPen: false }, // blinky
-        { x: 13, y: 14, inPen: true }, // pinky
-        { x: 11, y: 14, inPen: true }, // inky
-        { x: 15, y: 14, inPen: true }, // clyde
-      ]
+      const initialPos = INITIAL_GHOST_POSITIONS[index]!
       return {
         ...ghost,
-        pos: initialPositions[index]!,
+        pos: { x: initialPos.x, y: initialPos.y },
         dir: index === 0 ? 'left' : 'up',
         mode: 'scatter',
-        inPen: initialPositions[index]!.inPen,
+        inPen: initialPos.inPen,
         eyesOnly: false,
         frightenedFlash: false,
       }
