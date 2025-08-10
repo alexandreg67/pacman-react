@@ -24,6 +24,7 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     gameStatus: 'playing',
     deathAnimationTicks: 0,
     started: false,
+    respawnProtectionTicks: 0,
     ghosts: [],
     level: 1,
     globalModeIndex: 1, // chase

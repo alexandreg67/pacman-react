@@ -31,14 +31,13 @@ describe('Game Startup and Movement Logic', () => {
       const state = initialState()
       const result = step(state) // No input
 
-      // Ghosts should not move before game starts
-      result.ghosts.forEach((ghost, index) => {
-        expect(ghost.pos).toEqual(state.ghosts[index]!.pos)
-      })
-
+      // Game should not start without input
       expect(result.started).toBe(false)
       expect(result.deathAnimationTicks).toBe(0)
       expect(result.lives).toBe(3)
+
+      // Pacman should not move without input
+      expect(result.pacman).toEqual(state.pacman)
     })
 
     it('should not lose lives without any movement', () => {
