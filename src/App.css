@@ -123,6 +123,36 @@
   .pacman-container {
     transition: none !important;
   }
+
+  /* Désactiver toutes les animations pour l'accessibilité */
+  * {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Désactiver spécifiquement glow-pulse et autres animations du GameOver */
+  .animate-glow-pulse,
+  .animate-pulse,
+  .animate-bounce,
+  .animate-ping {
+    animation: none !important;
+  }
+
+  /* Maintenir les transformations de base sans animation */
+  .hover\:scale-105:hover {
+    transform: scale(1) !important;
+    transition: none !important;
+  }
+
+  /* Désactiver les box-shadows animées */
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 20px 4px currentColor;
+    }
+  }
 }
 
 @media (prefers-contrast: high) {
@@ -138,6 +168,28 @@
   .pellet-dot,
   .power-pellet {
     border: 1px solid #ffffff;
+  }
+
+  /* Améliorer le contraste pour le GameOver screen */
+  .text-slate-400 {
+    color: #cbd5e1 !important; /* Contraste ratio amélioré */
+  }
+
+  .text-slate-300 {
+    color: #e2e8f0 !important; /* Contraste ratio amélioré */
+  }
+
+  /* Focus ring plus visible */
+  button:focus {
+    outline: 3px solid #ffffff !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Améliorer les couleurs des touches kbd */
+  kbd {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border: 2px solid #ffffff !important;
   }
 }
 
@@ -208,6 +260,138 @@ kbd {
   animation:
     ghost-bob 0.8s ease-in-out infinite,
     ghost-flash 0.4s steps(2, end) infinite;
+}
+
+/* ===== GAME OVER SCREEN ANIMATIONS ===== */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 40px 12px currentColor,
+      0 0 80px 20px currentColor;
+  }
+  50% {
+    box-shadow:
+      0 0 30px 8px currentColor,
+      0 0 60px 15px currentColor;
+  }
+}
+
+/* ===== GAME OVER SCREEN RETRO PIXEL ART STYLE ===== */
+.game-over-modal {
+  background-color: #000 !important;
+  border: 4px solid #ffff00 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    0 0 0 4px #000,
+    0 0 20px #ffff00,
+    inset 0 0 20px rgba(255, 255, 0, 0.2) !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+.game-over-title {
+  color: #ff0000 !important;
+  text-shadow:
+    3px 0 0 #ffff00,
+    0 3px 0 #ffff00,
+    -3px 0 0 #ffff00,
+    0 -3px 0 #ffff00 !important;
+  letter-spacing: 4px !important;
+  font-weight: bold !important;
+}
+
+.game-over-score {
+  color: #00ffff !important;
+  text-shadow: 0 0 10px #00ffff !important;
+}
+
+.pixel-border {
+  border: 2px solid #ffff00 !important;
+  box-shadow:
+    inset 2px 2px 0 0 #ffff00,
+    inset -2px -2px 0 0 #ffff00 !important;
+}
+
+.pixel-button {
+  background: #ffff00 !important;
+  color: #000 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow:
+    4px 4px 0 0 #ff0000,
+    inset 2px 2px 0 0 #ffffff !important;
+  font-family: 'Courier New', monospace !important;
+  font-weight: bold !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  transition: all 0.1s !important;
+}
+
+.pixel-button:hover {
+  transform: translate(2px, 2px) !important;
+  box-shadow:
+    2px 2px 0 0 #ff0000,
+    inset 2px 2px 0 0 #ffffff !important;
+}
+
+.pixel-button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: none !important;
+}
+
+.pixel-corner {
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid #ffff00 !important;
+  background: #000 !important;
+}
+
+.pixel-corner-tl {
+  border-right: none !important;
+  border-bottom: none !important;
+  top: -8px !important;
+  left: -8px !important;
+}
+
+.pixel-corner-tr {
+  border-left: none !important;
+  border-bottom: none !important;
+  top: -8px !important;
+  right: -8px !important;
+}
+
+.pixel-corner-bl {
+  border-right: none !important;
+  border-top: none !important;
+  bottom: -8px !important;
+  left: -8px !important;
+}
+
+.pixel-corner-br {
+  border-left: none !important;
+  border-top: none !important;
+  bottom: -8px !important;
+  right: -8px !important;
+}
+
+.retro-stats-card {
+  background: #111 !important;
+  border: 2px solid #00ffff !important;
+  box-shadow: 0 0 10px #00ffff !important;
+}
+
+@keyframes retro-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.retro-pulse {
+  animation: retro-pulse 1s infinite !important;
 }
 
 /* Désactiver les transitions coûteuses sur mobile */

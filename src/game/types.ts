@@ -49,6 +49,7 @@ export type GameState = {
   gameStatus: GameStatus
   deathAnimationTicks: number // Durée animation de mort
   started: boolean // Indique si le jeu a commencé (premier input reçu)
+  gameStartTime: number // Timestamp when the game actually started (first input)
   /**
    * Nombre de ticks d'invincibilité après respawn
    */

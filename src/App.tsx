@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { ThemeToggle } from './components/ThemeToggle'
+import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
@@ -190,6 +191,20 @@ function App() {
           <GameInstructions />
         </footer>
       </div>
+
+      {/* Game Over Screen - déplacé ici pour un centrage correct */}
+      {state.gameStatus === 'game-over' && (
+        <GameOverScreen
+          score={state.score}
+          onRestart={restart}
+          level={state.level}
+          timeElapsed={
+            state.gameStartTime > 0
+              ? Math.floor((Date.now() - state.gameStartTime) / 1000)
+              : undefined
+          }
+        />
+      )}
     </div>
   )
 }

@@ -24,6 +24,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
     gameStatus: 'playing',
     deathAnimationTicks: 0,
     started: false,
+    gameStartTime: 0,
     respawnProtectionTicks: 0,
     ghosts: [],
     level: 1,
