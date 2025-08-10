@@ -15,17 +15,20 @@ export function shouldReleaseGhost(state: GameState, ghost: Ghost): boolean {
 }
 
 export function getHouseDoorTarget(state: GameState): { x: number; y: number } {
-  // For the classic Pac-Man maze, the ghost house is typically around the center
-  // Based on our grid, let's find the house center more accurately
-  const h = state.grid.length
+  // For our specific CLASSIC_MAP, the house entrance is at row 9 (0-indexed)
+  // and the entrance is in the middle of the map
   const w = state.grid[0]?.length ?? 0
+  const houseDoorX = Math.floor(w / 2) // Should be around column 14 (center)
+  const houseDoorY = 9 // Row where the entrance is open
 
-  // Look for the ghost house area - typically around the center of the maze
-  // In the classic layout, this is around coordinates (13, 14)
+  return { x: houseDoorX, y: houseDoorY }
+}
+
+export function getHouseCenterTarget(state: GameState): { x: number; y: number } {
+  // The actual center of the ghost house for respawning
+  const w = state.grid[0]?.length ?? 0
   const houseCenterX = Math.floor(w / 2)
-  const houseCenterY = Math.floor(h / 2)
+  const houseCenterY = 14 // Middle of the house area
 
-  // For eaten ghosts, they should return to a specific position in the house
-  // Let's use a fixed position that should work for the classic maze
   return { x: houseCenterX, y: houseCenterY }
 }

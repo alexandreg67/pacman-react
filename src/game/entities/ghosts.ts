@@ -68,7 +68,10 @@ function getPossibleDirections(state: GameState, ghost: Ghost): Direction[] {
     // vertical bounds (no vertical wrap in classic)
     if (ny < 0 || ny >= h) continue
     if (nx < 0 || nx >= w) continue
-    if (isWall(state.grid, nx, ny)) continue
+
+    // Eaten ghosts (eyes only) can pass through walls to return to the house
+    if (ghost.mode !== 'eaten' && isWall(state.grid, nx, ny)) continue
+
     result.push(dir)
   }
   return result
@@ -195,7 +198,8 @@ export function stepGhosts(state: GameState): GameState {
     const { x: wrappedX, wrapped } = handleHorizontalWrapForGhost(state, rawX, rawY)
     const finalX = wrappedX
     const finalY = rawY
-    if (isWall(state.grid, finalX, finalY)) return currentGhost
+    // Eaten ghosts can pass through walls, others cannot
+    if (currentGhost.mode !== 'eaten' && isWall(state.grid, finalX, finalY)) return currentGhost
     const moved: Ghost = {
       ...currentGhost,
       pos: { x: finalX, y: finalY },
@@ -205,16 +209,16 @@ export function stepGhosts(state: GameState): GameState {
     // If eyes (eaten) reached house target, respawn
     if (moved.mode === 'eaten') {
       const target = getTargetTileForGhost(state, moved)
-      // Allow some tolerance for reaching the target (within 1 tile)
+      // Allow some tolerance for reaching the target (within 2 tiles)
       const dx = Math.abs(finalX - target.x)
       const dy = Math.abs(finalY - target.y)
-      if (dx <= 1 && dy <= 1) {
+      if (dx <= 2 && dy <= 2) {
         return {
           ...moved,
           mode: getCurrentGlobalMode(state),
           eyesOnly: false,
           inPen: true,
-          // Reset to a proper house position
+          // Reset to the house center position
           pos: { x: target.x, y: target.y },
         }
       }
