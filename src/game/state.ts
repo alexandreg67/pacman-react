@@ -31,6 +31,7 @@ export function initialState(): GameState {
     gameStatus: 'playing',
     deathAnimationTicks: 0,
     started: false,
+    respawnProtectionTicks: 0, // Ajout de la propriété manquante
     // Ghost system (Phase 0 defaults)
     ghosts: [
       {
