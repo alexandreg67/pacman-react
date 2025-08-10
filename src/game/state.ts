@@ -91,7 +91,7 @@ export function handlePacmanDeath(state: GameState): GameState {
       ...state,
       lives: 0,
       gameStatus: 'game-over',
-      deathAnimationTicks: 60, // 60 frames d'animation de mort
+      deathAnimationTicks: 30, // Animation plus courte pour game over
     }
   }
 
@@ -103,9 +103,11 @@ export function handlePacmanDeath(state: GameState): GameState {
     pacman: { ...spawn.pacman },
     dir: 'left',
     queuedDir: undefined,
-    deathAnimationTicks: 60,
+    deathAnimationTicks: 20, // Animation plus courte (1.5-2 secondes)
     frightenedTicks: 0,
     frightChain: 0,
+    started: true, // IMPORTANT: Garder le jeu démarré après respawn
+    respawnProtectionTicks: 60, // 2 secondes d'invincibilité post-respawn (à ajuster)
     // Remettre les fantômes à leurs positions initiales
     ghosts: state.ghosts.map((ghost, index) => {
       const initialPositions = [
@@ -136,6 +138,11 @@ export function tick(state: GameState): GameState {
   // Décrémenter l'animation de mort
   const deathAnimationTicks = Math.max(0, state.deathAnimationTicks - 1)
 
+  // Décrémenter la protection post-respawn
+  const respawnProtectionTicks = state.respawnProtectionTicks
+    ? Math.max(0, state.respawnProtectionTicks - 1)
+    : 0
+
   // Si l'animation de mort est terminée et qu'on a encore des vies, reprendre le jeu
   let gameStatus = state.gameStatus
   if (state.deathAnimationTicks > 0 && deathAnimationTicks === 0 && state.lives > 0) {
@@ -155,14 +162,24 @@ export function tick(state: GameState): GameState {
     tickCount: state.tickCount + 1,
     deathAnimationTicks,
     gameStatus,
+    respawnProtectionTicks,
   }
 }
 
 export function step(state: GameState, inputDir?: Direction): GameState {
   let next: GameState = state
 
-  // Si on est en game over ou en animation de mort, ne traiter que le tick
-  if (state.gameStatus === 'game-over' || state.deathAnimationTicks > 0) {
+  // Si on est en game over, ne traiter que le tick
+  if (state.gameStatus === 'game-over') {
+    return tick(next)
+  }
+
+  // Si on est en animation de mort, permettre le buffer d'input mais pas le mouvement
+  if (state.deathAnimationTicks > 0) {
+    // Buffer l'input pour après l'animation
+    if (typeof inputDir !== 'undefined') {
+      next = { ...next, queuedDir: inputDir }
+    }
     return tick(next)
   }
 

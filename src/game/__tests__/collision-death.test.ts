@@ -9,7 +9,7 @@ describe('Ghost-Pacman Collision and Death', () => {
       const result = handlePacmanDeath(state)
 
       expect(result.lives).toBe(2) // 3 - 1
-      expect(result.deathAnimationTicks).toBe(60)
+      expect(result.deathAnimationTicks).toBe(20)
       expect(result.gameStatus).toBe('playing') // Still playing with lives left
     })
 
@@ -19,7 +19,7 @@ describe('Ghost-Pacman Collision and Death', () => {
 
       expect(result.lives).toBe(0)
       expect(result.gameStatus).toBe('game-over')
-      expect(result.deathAnimationTicks).toBe(60)
+      expect(result.deathAnimationTicks).toBe(30)
     })
 
     it('should respawn Pacman at initial position after death', () => {

@@ -184,6 +184,12 @@ export function stepGhosts(state: GameState): GameState {
           eyesOnly: true,
         }
       } else if (ghost.mode !== 'eaten') {
+        // Protection temporaire après respawn
+        if (state.respawnProtectionTicks > 0) {
+          // Ne pas tuer Pacman, juste retourner le fantôme sans collision
+          return ghost // Fantôme reste à sa position précédente
+        }
+
         // Ghost kills Pacman - handle death
         return {
           ...moved,

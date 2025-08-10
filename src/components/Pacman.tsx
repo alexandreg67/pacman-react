@@ -5,9 +5,12 @@ type Props = {
   size: number
   direction: Direction
   mouthOpen?: boolean
+  isProtected?: boolean
+  tickCount?: number
 }
 
-export const Pacman = React.memo(({ size, direction, mouthOpen = true }: Props) => {
+export const Pacman = React.memo((props: Props) => {
+  const { size, direction, mouthOpen = true, isProtected = false, tickCount = 0 } = props
   // CSS-based Pacman optimisé pour de meilleures performances
   const pacmanSize = Math.floor(size * 0.85) // Légèrement plus petit que la cellule
 
@@ -76,8 +79,17 @@ export const Pacman = React.memo(({ size, direction, mouthOpen = true }: Props) 
     [pacmanSize, direction],
   )
 
+  // Effet de clignotement pendant la protection
+  const blink = isProtected && Math.floor(tickCount / 6) % 2 === 0
   return (
-    <div className="relative flex items-center justify-center" style={containerStyle}>
+    <div
+      className="relative flex items-center justify-center"
+      style={{
+        ...containerStyle,
+        opacity: blink ? 0.4 : 1,
+        filter: blink ? 'drop-shadow(0 0 6px #FFD700)' : undefined,
+      }}
+    >
       {/* Corps principal de Pacman */}
       <div style={bodyStyle} />
 
