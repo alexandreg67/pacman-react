@@ -6,6 +6,7 @@ export const Cell = {
   Wall: 'Wall',
   Pellet: 'Pellet',
   PowerPellet: 'PowerPellet',
+  GhostDoor: 'GhostDoor', // Porte que seuls les fantômes peuvent traverser
 } as const
 export type Cell = (typeof Cell)[keyof typeof Cell]
 
@@ -31,6 +32,8 @@ export type Ghost = {
   justWrapped?: boolean
 }
 
+export type GameStatus = 'playing' | 'game-over' | 'paused'
+
 export type GameState = {
   grid: Grid
   pacman: Vec
@@ -43,6 +46,13 @@ export type GameState = {
   tickCount: number
   tunnelRows: number[]
   justWrapped?: boolean // Indique qu'un wrap vient d'avoir lieu (pour optimisations UI)
+  gameStatus: GameStatus
+  deathAnimationTicks: number // Durée animation de mort
+  started: boolean // Indique si le jeu a commencé (premier input reçu)
+  /**
+   * Nombre de ticks d'invincibilité après respawn
+   */
+  respawnProtectionTicks: number
   // Future: tunnelCols: number[] pour le wrap vertical
   // Ghost system (added in Phase 0; not yet used for gameplay)
   ghosts: Ghost[]
@@ -62,3 +72,5 @@ export const SCORES = {
 export const TIMERS = {
   frightenedDurationTicks: 40,
 } as const
+
+// Protection post-respawn : éviter les morts immédiates

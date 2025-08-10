@@ -3,10 +3,12 @@ import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
 import { Ghost } from './Ghost'
+import { GameOverScreen } from './GameOverScreen'
 
 type Props = {
   state: GameState
   tileSize?: number
+  onRestart?: () => void
 }
 
 interface WallNeighbors {
@@ -112,9 +114,25 @@ const Wall = React.memo(
 
 // Composant Path mémorisé
 const PathCell = React.memo(({ cell, tileSize }: { cell: Cell; tileSize: number }) => (
-  <div className="path-segment" style={{ width: tileSize, height: tileSize }}>
+  <div className="path-segment" style={{ width: tileSize, height: tileSize, position: 'relative' }}>
     {cell === Cell.Pellet && <div className="pellet-dot" />}
     {cell === Cell.PowerPellet && <div className="power-pellet" />}
+    {cell === Cell.GhostDoor && (
+      <div
+        className="ghost-door"
+        style={{
+          width: '80%',
+          height: '3px',
+          backgroundColor: '#ffffff',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '2px',
+          boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)',
+        }}
+      />
+    )}
   </div>
 ))
 
@@ -127,6 +145,7 @@ const PacmanRenderer = React.memo(
     tickCount,
     tileSize,
     justWrapped = false,
+    isProtected = false,
   }: {
     x: number
     y: number
@@ -134,6 +153,7 @@ const PacmanRenderer = React.memo(
     tickCount: number
     tileSize: number
     justWrapped?: boolean
+    isProtected?: boolean
   }) => (
     <div
       className="absolute pacman-container"
@@ -142,7 +162,6 @@ const PacmanRenderer = React.memo(
         width: tileSize,
         height: tileSize,
         zIndex: 100,
-        // Désactiver la transition quand un wrap vient d'avoir lieu pour éviter l'effet fantôme
         transition: justWrapped ? 'none' : 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
       aria-label="pacman"
@@ -151,12 +170,14 @@ const PacmanRenderer = React.memo(
         size={tileSize}
         direction={direction}
         mouthOpen={Math.floor(tickCount / 4) % 2 === 0}
+        isProtected={isProtected}
+        tickCount={tickCount}
       />
     </div>
   ),
 )
 
-export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
+export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => {
   const h = state.grid.length
   const w = state.grid[0]?.length ?? 0
 
@@ -180,8 +201,16 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
       direction: state.dir,
       tickCount: state.tickCount,
       justWrapped: state.justWrapped || false,
+      isProtected: state.respawnProtectionTicks > 0,
     }),
-    [state.pacman.x, state.pacman.y, state.dir, state.tickCount, state.justWrapped],
+    [
+      state.pacman.x,
+      state.pacman.y,
+      state.dir,
+      state.tickCount,
+      state.justWrapped,
+      state.respawnProtectionTicks,
+    ],
   )
 
   // Mémoriser l'éclairage ambiant
@@ -233,6 +262,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
           tickCount={pacmanPosition.tickCount}
           tileSize={tileSize}
           justWrapped={pacmanPosition.justWrapped}
+          isProtected={pacmanPosition.isProtected}
         />
 
         {/* Ghosts (Phase 4 rendering) */}
@@ -263,6 +293,37 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
 
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
+
+        {/* Game Over Screen */}
+        {state.gameStatus === 'game-over' && onRestart && (
+          <GameOverScreen score={state.score} onRestart={onRestart} />
+        )}
+      </div>
+
+      {/* Game Info UI */}
+      <div className="flex justify-between items-center w-full max-w-md">
+        <div className="text-white">
+          <span className="text-sm font-medium">Score: </span>
+          <span className="text-lg font-bold text-yellow-400 tabular-nums">
+            {state.score.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-white text-sm font-medium">Lives: </span>
+          <div className="flex gap-1">
+            {Array.from({ length: Math.max(0, state.lives) }).map((_, i) => (
+              <div
+                key={i}
+                className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs"
+                aria-label={`Life ${i + 1}`}
+              >
+                🟡
+              </div>
+            ))}
+            {state.lives === 0 && <span className="text-red-500 text-sm font-bold">GAME OVER</span>}
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -21,6 +21,10 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     frightenedTicks: 0,
     tickCount: 0,
     tunnelRows: [],
+    gameStatus: 'playing',
+    deathAnimationTicks: 0,
+    started: false,
+    respawnProtectionTicks: 0,
     ghosts: [],
     level: 1,
     globalModeIndex: 1, // chase
@@ -73,15 +77,15 @@ describe('ghosts: release and collisions', () => {
   })
 
   it('frightened collision eats ghost, increments score and chain', () => {
-    // Place ghost just below pacman so it moves up into pacman
+    // Place ghost at same position as pacman to ensure collision
     let state = baseState({
       frightenedTicks: 10,
       ghosts: [
         {
           id: 'blinky',
-          pos: { x: 3, y: 4 },
+          pos: { x: 3, y: 3 }, // Same position as pacman
           dir: 'up',
-          mode: 'chase',
+          mode: 'frightened', // Already in frightened mode
           inPen: false,
           dotCounter: 0,
           eyesOnly: false,

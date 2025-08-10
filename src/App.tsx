@@ -92,7 +92,7 @@ const GameInstructions = React.memo(() => (
 GameInstructions.displayName = 'GameInstructions'
 
 function App() {
-  const { state, stepInput, reset } = useGame()
+  const { state, stepInput, reset, restart } = useGame()
 
   // Mémorisation des handlers d'événements
   const handleKeyDown = useCallback(
@@ -142,8 +142,9 @@ function App() {
     () => ({
       state,
       tileSize: 28,
+      onRestart: restart,
     }),
-    [state],
+    [state, restart],
   )
 
   // Mémorisation des statistiques

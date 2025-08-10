@@ -21,6 +21,10 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
     frightenedTicks: 0,
     tickCount: 0,
     tunnelRows: [],
+    gameStatus: 'playing',
+    deathAnimationTicks: 0,
+    started: false,
+    respawnProtectionTicks: 0,
     ghosts: [],
     level: 1,
     globalModeIndex: 1, // chase
