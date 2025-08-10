@@ -97,7 +97,7 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
   }, [onRestart])
 
   const formatTime = (seconds?: number): string => {
-    if (!seconds) return 'N/A'
+    if (seconds == null) return 'N/A'
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
@@ -137,25 +137,11 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
         )}
 
         {/* Game Over Title */}
-        <div className="mb-6">
-          <h1
-            id="game-over-title"
-            className="game-over-title text-4xl md:text-5xl mb-4 retro-pulse"
-          >
-            GAME OVER
-          </h1>
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <div className="w-8 h-1 bg-red-500"></div>
-            <div className="text-red-500 text-xl">💀</div>
-            <div className="w-8 h-1 bg-red-500"></div>
-          </div>
-        </div>
-        {/* Game Over Title */}
         <div className="mb-8">
           <div className="relative">
             <h1
               id="game-over-title"
-              className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent mb-4 tracking-widest animate-pulse drop-shadow-2xl"
+              className="game-over-title text-6xl md:text-7xl font-extrabold mb-4 tracking-widest retro-pulse drop-shadow-2xl"
               style={{ textShadow: '0 0 20px rgba(239, 68, 68, 0.5)' }}
             >
               GAME OVER

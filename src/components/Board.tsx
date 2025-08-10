@@ -297,21 +297,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
 
-        {/* Overlay opaque - modale déplacée dans App.tsx pour un centrage correct */}
-        {/* 
-        {state.gameStatus === 'game-over' && onRestart && (
-          <GameOverScreen
-            score={state.score}
-            onRestart={onRestart}
-            level={state.level}
-            timeElapsed={
-              state.gameStartTime > 0
-                ? Math.floor((Date.now() - state.gameStartTime) / 1000)
-                : undefined
-            }
-          />
-        )}
-        */}
+        {/* Note: Game Over modal moved to App.tsx for proper viewport centering */}
       </div>
 
       {/* Game Info UI */}
