@@ -32,6 +32,7 @@ export function initialState(): GameState {
     gameStatus: 'playing',
     deathAnimationTicks: 0,
     started: false,
+    gameStartTime: 0,
     respawnProtectionTicks: 0, // Add missing property
     // Ghost system (Phase 0 defaults)
     ghosts: INITIAL_GHOST_POSITIONS.map((pos, index) => {
@@ -161,7 +162,7 @@ export function step(state: GameState, inputDir?: Direction): GameState {
 
   // Marquer le jeu comme commencé si on reçoit un input
   if (inputDir && !next.started) {
-    next = { ...next, started: true }
+    next = { ...next, started: true, gameStartTime: Date.now() }
   }
 
   // Try to move: prefer queuedDir, else current dir only if game has started

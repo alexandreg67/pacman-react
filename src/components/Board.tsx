@@ -296,7 +296,16 @@ export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => 
 
         {/* Game Over Screen */}
         {state.gameStatus === 'game-over' && onRestart && (
-          <GameOverScreen score={state.score} onRestart={onRestart} />
+          <GameOverScreen
+            score={state.score}
+            onRestart={onRestart}
+            level={state.level}
+            timeElapsed={
+              state.gameStartTime > 0
+                ? Math.floor((Date.now() - state.gameStartTime) / 1000)
+                : undefined
+            }
+          />
         )}
       </div>
 
