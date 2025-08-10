@@ -23,6 +23,7 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     tunnelRows: [],
     gameStatus: 'playing',
     deathAnimationTicks: 0,
+    started: false,
     ghosts: [],
     level: 1,
     globalModeIndex: 1, // chase

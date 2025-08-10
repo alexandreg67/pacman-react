@@ -185,7 +185,6 @@ export function stepGhosts(state: GameState): GameState {
         }
       } else if (ghost.mode !== 'eaten') {
         // Ghost kills Pacman - handle death
-        // We need to return a special marker to indicate death happened
         return {
           ...moved,
           // Marquer ce fantôme comme ayant causé la mort pour traitement spécial

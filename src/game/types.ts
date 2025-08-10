@@ -47,6 +47,7 @@ export type GameState = {
   justWrapped?: boolean // Indique qu'un wrap vient d'avoir lieu (pour optimisations UI)
   gameStatus: GameStatus
   deathAnimationTicks: number // Durée animation de mort
+  started: boolean // Indique si le jeu a commencé (premier input reçu)
   // Future: tunnelCols: number[] pour le wrap vertical
   // Ghost system (added in Phase 0; not yet used for gameplay)
   ghosts: Ghost[]

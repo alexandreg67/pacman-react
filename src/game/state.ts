@@ -30,6 +30,7 @@ export function initialState(): GameState {
     tunnelRows,
     gameStatus: 'playing',
     deathAnimationTicks: 0,
+    started: false,
     // Ghost system (Phase 0 defaults)
     ghosts: [
       {
@@ -173,8 +174,13 @@ export function step(state: GameState, inputDir?: Direction): GameState {
     next = { ...next, queuedDir: inputDir }
   }
 
-  // Try to move: prefer queuedDir, else current dir
-  const desired: Direction | undefined = next.queuedDir ?? next.dir
+  // Marquer le jeu comme commencé si on reçoit un input
+  if (inputDir && !next.started) {
+    next = { ...next, started: true }
+  }
+
+  // Try to move: prefer queuedDir, else current dir only if game has started
+  const desired: Direction | undefined = next.queuedDir ?? (next.started ? next.dir : undefined)
   if (desired) {
     const moved = attemptMove(next, desired)
     next = moved
