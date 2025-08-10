@@ -32,7 +32,7 @@ export function initialState(): GameState {
     gameStatus: 'playing',
     deathAnimationTicks: 0,
     started: false,
-    respawnProtectionTicks: 0, // Ajout de la propriété manquante
+    respawnProtectionTicks: 0, // Add missing property
     // Ghost system (Phase 0 defaults)
     ghosts: INITIAL_GHOST_POSITIONS.map((pos, index) => {
       const ghostIds = ['blinky', 'pinky', 'inky', 'clyde'] as const
@@ -64,11 +64,11 @@ export function handlePacmanDeath(state: GameState): GameState {
       ...state,
       lives: 0,
       gameStatus: 'game-over',
-      deathAnimationTicks: 30, // Animation plus courte pour game over
+      deathAnimationTicks: 30, // Shorter animation for game over
     }
   }
 
-  // Respawn: remettre Pacman à sa position initiale et réinitialiser les fantômes
+  // Respawn: reset Pacman to initial position and reinitialize ghosts
   const { spawn } = parseMap(CLASSIC_MAP)
   return {
     ...state,
@@ -76,12 +76,12 @@ export function handlePacmanDeath(state: GameState): GameState {
     pacman: { ...spawn.pacman },
     dir: 'left',
     queuedDir: undefined,
-    deathAnimationTicks: 20, // Animation plus courte (1.5-2 secondes)
+    deathAnimationTicks: 20, // Shorter animation (1.5-2 seconds)
     frightenedTicks: 0,
     frightChain: 0,
-    started: true, // IMPORTANT: Garder le jeu démarré après respawn
-    respawnProtectionTicks: 60, // 2 secondes d'invincibilité post-respawn (à ajuster)
-    // Remettre les fantômes à leurs positions initiales
+    started: true, // IMPORTANT: Keep game started after respawn
+    respawnProtectionTicks: 60, // 2 seconds of post-respawn invincibility (adjustable)
+    // Reset ghosts to their initial positions
     ghosts: state.ghosts.map((ghost, index) => {
       const initialPos = INITIAL_GHOST_POSITIONS[index]!
       return {
