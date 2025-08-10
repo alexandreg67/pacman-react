@@ -28,6 +28,8 @@ export function initialState(): GameState {
     frightenedTicks: 0,
     tickCount: 0,
     tunnelRows,
+    gameStatus: 'playing',
+    deathAnimationTicks: 0,
     // Ghost system (Phase 0 defaults)
     ghosts: [
       {
@@ -80,22 +82,88 @@ export function initialState(): GameState {
   }
 }
 
+export function handlePacmanDeath(state: GameState): GameState {
+  const newLives = state.lives - 1
+
+  if (newLives <= 0) {
+    return {
+      ...state,
+      lives: 0,
+      gameStatus: 'game-over',
+      deathAnimationTicks: 60, // 60 frames d'animation de mort
+    }
+  }
+
+  // Respawn: remettre Pacman à sa position initiale et réinitialiser les fantômes
+  const { spawn } = parseMap(CLASSIC_MAP)
+  return {
+    ...state,
+    lives: newLives,
+    pacman: { ...spawn.pacman },
+    dir: 'left',
+    queuedDir: undefined,
+    deathAnimationTicks: 60,
+    frightenedTicks: 0,
+    frightChain: 0,
+    // Remettre les fantômes à leurs positions initiales
+    ghosts: state.ghosts.map((ghost, index) => {
+      const initialPositions = [
+        { x: 13, y: 11, inPen: false }, // blinky
+        { x: 13, y: 14, inPen: true }, // pinky
+        { x: 11, y: 14, inPen: true }, // inky
+        { x: 15, y: 14, inPen: true }, // clyde
+      ]
+      return {
+        ...ghost,
+        pos: initialPositions[index]!,
+        dir: index === 0 ? 'left' : 'up',
+        mode: 'scatter',
+        inPen: initialPositions[index]!.inPen,
+        eyesOnly: false,
+        frightenedFlash: false,
+      }
+    }),
+  }
+}
+
 export function tick(state: GameState): GameState {
+  // Si on est en game over, ne pas continuer le jeu
+  if (state.gameStatus === 'game-over') {
+    return state
+  }
+
+  // Décrémenter l'animation de mort
+  const deathAnimationTicks = Math.max(0, state.deathAnimationTicks - 1)
+
+  // Si l'animation de mort est terminée et qu'on a encore des vies, reprendre le jeu
+  let gameStatus = state.gameStatus
+  if (state.deathAnimationTicks > 0 && deathAnimationTicks === 0 && state.lives > 0) {
+    gameStatus = 'playing'
+  }
+
   // Global mode timer
   const { index, ticksRemaining } = advanceGlobalModeTimer(state)
   // Decay frightened timer if active
   const frightenedTicks = Math.max(0, state.frightenedTicks - 1)
+
   return {
     ...state,
     frightenedTicks,
     globalModeIndex: index,
     globalModeTicksRemaining: ticksRemaining,
     tickCount: state.tickCount + 1,
+    deathAnimationTicks,
+    gameStatus,
   }
 }
 
 export function step(state: GameState, inputDir?: Direction): GameState {
   let next: GameState = state
+
+  // Si on est en game over ou en animation de mort, ne traiter que le tick
+  if (state.gameStatus === 'game-over' || state.deathAnimationTicks > 0) {
+    return tick(next)
+  }
 
   // Réinitialiser justWrapped du step précédent
   next = { ...next, justWrapped: false }

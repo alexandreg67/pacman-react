@@ -4,6 +4,7 @@ import { getCurrentGlobalMode } from '../logic/ghostModes'
 import { getTargetTileForGhost } from '../logic/ghostAi'
 import { shouldReleaseGhost } from '../logic/ghostHouse'
 import { getGhostStride } from '../logic/ghostSpeed'
+import { handlePacmanDeath } from '../state'
 
 type Delta = { dx: number; dy: number }
 
@@ -182,14 +183,44 @@ export function stepGhosts(state: GameState): GameState {
           mode: 'eaten',
           eyesOnly: true,
         }
-      } else {
-        // TODO: handle pacman death (future step)
-        return moved
+      } else if (ghost.mode !== 'eaten') {
+        // Ghost kills Pacman - handle death
+        // We need to return a special marker to indicate death happened
+        return {
+          ...moved,
+          // Marquer ce fantôme comme ayant causé la mort pour traitement spécial
+          killedPacman: true,
+        } as Ghost & { killedPacman: boolean }
       }
     }
 
     return moved
   })
+
+  // Vérifier si un fantôme a tué Pacman
+  const ghostKilledPacman = updatedGhosts.some(
+    (ghost) =>
+      'killedPacman' in ghost && (ghost as Ghost & { killedPacman?: boolean }).killedPacman,
+  )
+
+  if (ghostKilledPacman) {
+    // Nettoyer la propriété killedPacman des fantômes
+    const cleanedGhosts = updatedGhosts.map((ghost) => {
+      if ('killedPacman' in ghost) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { killedPacman, ...cleanGhost } = ghost as Ghost & { killedPacman: boolean }
+        return cleanGhost
+      }
+      return ghost
+    })
+    // Appliquer la mort de Pacman
+    return handlePacmanDeath({
+      ...state,
+      ghosts: cleanedGhosts,
+      score: state.score + scoreDelta,
+      frightChain,
+    })
+  }
 
   if (scoreDelta !== 0 || frightChain !== state.frightChain) {
     return { ...state, ghosts: updatedGhosts, score: state.score + scoreDelta, frightChain }
