@@ -1,5 +1,4 @@
 import type { GameState, Ghost } from '../types'
-import { Cell } from '../types'
 import { getReleaseThresholds } from './ghostSpeed'
 
 // Phase 0: placeholders for pen and release logic
@@ -16,19 +15,17 @@ export function shouldReleaseGhost(state: GameState, ghost: Ghost): boolean {
 }
 
 export function getHouseDoorTarget(state: GameState): { x: number; y: number } {
-  // Heuristic: use median X of ghosts currently in pen, then scan upward to first non-wall
-  const inPen = state.ghosts.filter((g) => g.inPen)
+  // For the classic Pac-Man maze, the ghost house is typically around the center
+  // Based on our grid, let's find the house center more accurately
   const h = state.grid.length
   const w = state.grid[0]?.length ?? 0
-  const defaultPos = { x: Math.floor(w / 2), y: Math.floor(h / 2) }
-  if (inPen.length === 0) return defaultPos
-  const sortedX = [...inPen.map((g) => g.pos.x)].sort((a, b) => a - b)
-  const medianX = sortedX[Math.floor(sortedX.length / 2)] ?? defaultPos.x
-  const minY = Math.min(...inPen.map((g) => g.pos.y))
-  for (let y = minY - 1; y >= 0; y--) {
-    if (state.grid[y]?.[medianX] && state.grid[y]![medianX] !== Cell.Wall) {
-      return { x: medianX, y }
-    }
-  }
-  return defaultPos
+
+  // Look for the ghost house area - typically around the center of the maze
+  // In the classic layout, this is around coordinates (13, 14)
+  const houseCenterX = Math.floor(w / 2)
+  const houseCenterY = Math.floor(h / 2)
+
+  // For eaten ghosts, they should return to a specific position in the house
+  // Let's use a fixed position that should work for the classic maze
+  return { x: houseCenterX, y: houseCenterY }
 }

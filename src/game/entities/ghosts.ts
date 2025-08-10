@@ -120,60 +120,109 @@ export function stepGhosts(state: GameState): GameState {
   let scoreDelta = 0
   let frightChain = state.frightChain
   const updatedGhosts: Ghost[] = state.ghosts.map((ghost) => {
+    // Update ghost mode based on global frightened state
+    let currentGhost = ghost
+    if (state.frightenedTicks > 0 && ghost.mode !== 'eaten') {
+      // Put ghost in frightened mode
+      currentGhost = { ...ghost, mode: 'frightened' }
+    } else if (state.frightenedTicks === 0 && ghost.mode === 'frightened') {
+      // End frightened mode, return to global mode
+      currentGhost = { ...ghost, mode: getCurrentGlobalMode(state) }
+    }
+
     // Speed control: stride-based skipping
-    const stride = getGhostStride(state, ghost)
+    const stride = getGhostStride(state, currentGhost)
     const shouldMoveThisTick = state.tickCount % stride === 0
-    if (!shouldMoveThisTick) return ghost
+    if (!shouldMoveThisTick) return currentGhost
+
+    // Check collision with Pac-Man BEFORE movement
+    if (currentGhost.pos.x === state.pacman.x && currentGhost.pos.y === state.pacman.y) {
+      if (state.frightenedTicks > 0 && currentGhost.mode === 'frightened') {
+        // Eat ghost (only if in frightened mode)
+        const chainIdx = Math.min(frightChain, 3)
+        const chainScores = [200, 400, 800, 1600]
+        scoreDelta += chainScores[chainIdx]!
+        frightChain += 1
+        return {
+          ...currentGhost,
+          mode: 'eaten',
+          eyesOnly: true,
+        }
+      } else if (currentGhost.mode !== 'eaten' && currentGhost.mode !== 'frightened') {
+        // Protection temporaire après respawn
+        if (state.respawnProtectionTicks > 0) {
+          // Ne pas tuer Pacman, juste retourner le fantôme sans collision
+          return currentGhost
+        }
+
+        // Ghost kills Pacman - handle death
+        return {
+          ...currentGhost,
+          // Marquer ce fantôme comme ayant causé la mort pour traitement spécial
+          killedPacman: true,
+        } as Ghost & { killedPacman: boolean }
+      }
+    }
     // Release from pen if conditions met
-    if (ghost.inPen && shouldReleaseGhost(state, ghost)) {
+    if (currentGhost.inPen && shouldReleaseGhost(state, currentGhost)) {
       // Kick ghost one tile upward toward the door when releasing if possible
-      const door = getTargetTileForGhost(state, ghost)
-      const dy = ghost.pos.y > door.y ? -1 : 0
-      const nx = ghost.pos.x
-      const ny = ghost.pos.y + dy
+      const door = getTargetTileForGhost(state, currentGhost)
+      const dy = currentGhost.pos.y > door.y ? -1 : 0
+      const nx = currentGhost.pos.x
+      const ny = currentGhost.pos.y + dy
       if (!isWall(state.grid, nx, ny)) {
-        ghost = { ...ghost, inPen: false, pos: { x: nx, y: ny }, dir: dy < 0 ? 'up' : ghost.dir }
+        currentGhost = {
+          ...currentGhost,
+          inPen: false,
+          pos: { x: nx, y: ny },
+          dir: dy < 0 ? 'up' : currentGhost.dir,
+        }
       } else {
-        ghost = { ...ghost, inPen: false }
+        currentGhost = { ...currentGhost, inPen: false }
       }
     }
     // Phase 2: use per-ghost targeting based on modes
-    const target = getTargetTileForGhost(state, ghost)
+    const target = getTargetTileForGhost(state, currentGhost)
     const targetX = target.x
     const targetY = target.y
-    const options = getPossibleDirections(state, ghost)
-    const nextDir = chooseDirectionToward(state, ghost, targetX, targetY, options)
-    if (!nextDir) return ghost
+    const options = getPossibleDirections(state, currentGhost)
+    const nextDir = chooseDirectionToward(state, currentGhost, targetX, targetY, options)
+    if (!nextDir) return currentGhost
 
     const { dx, dy } = dirToDelta(nextDir)
-    const rawX = ghost.pos.x + dx
-    const rawY = ghost.pos.y + dy
+    const rawX = currentGhost.pos.x + dx
+    const rawY = currentGhost.pos.y + dy
     const { x: wrappedX, wrapped } = handleHorizontalWrapForGhost(state, rawX, rawY)
     const finalX = wrappedX
     const finalY = rawY
-    if (isWall(state.grid, finalX, finalY)) return ghost
+    if (isWall(state.grid, finalX, finalY)) return currentGhost
     const moved: Ghost = {
-      ...ghost,
+      ...currentGhost,
       pos: { x: finalX, y: finalY },
       dir: nextDir,
       justWrapped: wrapped,
     }
     // If eyes (eaten) reached house target, respawn
-    if (ghost.mode === 'eaten') {
-      const target = getTargetTileForGhost(state, ghost)
-      if (finalX === target.x && finalY === target.y) {
+    if (moved.mode === 'eaten') {
+      const target = getTargetTileForGhost(state, moved)
+      // Allow some tolerance for reaching the target (within 1 tile)
+      const dx = Math.abs(finalX - target.x)
+      const dy = Math.abs(finalY - target.y)
+      if (dx <= 1 && dy <= 1) {
         return {
           ...moved,
           mode: getCurrentGlobalMode(state),
           eyesOnly: false,
           inPen: true,
+          // Reset to a proper house position
+          pos: { x: target.x, y: target.y },
         }
       }
     }
     // Collision with Pac-Man
     if (finalX === state.pacman.x && finalY === state.pacman.y) {
-      if (state.frightenedTicks > 0 && ghost.mode !== 'eaten') {
-        // Eat ghost
+      if (state.frightenedTicks > 0 && moved.mode === 'frightened') {
+        // Eat ghost (only if in frightened mode)
         const chainIdx = Math.min(frightChain, 3)
         const chainScores = [200, 400, 800, 1600]
         scoreDelta += chainScores[chainIdx]!
@@ -183,7 +232,7 @@ export function stepGhosts(state: GameState): GameState {
           mode: 'eaten',
           eyesOnly: true,
         }
-      } else if (ghost.mode !== 'eaten') {
+      } else if (moved.mode !== 'eaten' && moved.mode !== 'frightened') {
         // Protection temporaire après respawn
         if (state.respawnProtectionTicks > 0) {
           // Ne pas tuer Pacman, juste retourner le fantôme sans collision
