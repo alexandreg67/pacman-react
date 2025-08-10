@@ -184,6 +184,7 @@ export function useGame() {
     reset,
     pause,
     resume,
+    restart: reset, // Alias pour la cohérence avec l'UI
     // Exposer les métriques de performance en développement
     ...(process.env.NODE_ENV === 'development' && {
       fps: timingRef.current.fps,

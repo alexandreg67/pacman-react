@@ -3,10 +3,12 @@ import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
 import { Ghost } from './Ghost'
+import { GameOverScreen } from './GameOverScreen'
 
 type Props = {
   state: GameState
   tileSize?: number
+  onRestart?: () => void
 }
 
 interface WallNeighbors {
@@ -156,7 +158,7 @@ const PacmanRenderer = React.memo(
   ),
 )
 
-export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
+export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => {
   const h = state.grid.length
   const w = state.grid[0]?.length ?? 0
 
@@ -263,6 +265,37 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
 
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
+
+        {/* Game Over Screen */}
+        {state.gameStatus === 'game-over' && onRestart && (
+          <GameOverScreen score={state.score} onRestart={onRestart} />
+        )}
+      </div>
+
+      {/* Game Info UI */}
+      <div className="flex justify-between items-center w-full max-w-md">
+        <div className="text-white">
+          <span className="text-sm font-medium">Score: </span>
+          <span className="text-lg font-bold text-yellow-400 tabular-nums">
+            {state.score.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-white text-sm font-medium">Lives: </span>
+          <div className="flex gap-1">
+            {Array.from({ length: Math.max(0, state.lives) }).map((_, i) => (
+              <div
+                key={i}
+                className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs"
+                aria-label={`Life ${i + 1}`}
+              >
+                🟡
+              </div>
+            ))}
+            {state.lives === 0 && <span className="text-red-500 text-sm font-bold">GAME OVER</span>}
+          </div>
+        </div>
       </div>
     </div>
   )
