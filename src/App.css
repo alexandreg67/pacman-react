@@ -123,6 +123,36 @@
   .pacman-container {
     transition: none !important;
   }
+
+  /* Désactiver toutes les animations pour l'accessibilité */
+  * {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Désactiver spécifiquement glow-pulse et autres animations du GameOver */
+  .animate-glow-pulse,
+  .animate-pulse,
+  .animate-bounce,
+  .animate-ping {
+    animation: none !important;
+  }
+
+  /* Maintenir les transformations de base sans animation */
+  .hover\:scale-105:hover {
+    transform: scale(1) !important;
+    transition: none !important;
+  }
+
+  /* Désactiver les box-shadows animées */
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 20px 4px currentColor;
+    }
+  }
 }
 
 @media (prefers-contrast: high) {
@@ -138,6 +168,28 @@
   .pellet-dot,
   .power-pellet {
     border: 1px solid #ffffff;
+  }
+
+  /* Améliorer le contraste pour le GameOver screen */
+  .text-slate-400 {
+    color: #cbd5e1 !important; /* Contraste ratio amélioré */
+  }
+
+  .text-slate-300 {
+    color: #e2e8f0 !important; /* Contraste ratio amélioré */
+  }
+
+  /* Focus ring plus visible */
+  button:focus {
+    outline: 3px solid #ffffff !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Améliorer les couleurs des touches kbd */
+  kbd {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border: 2px solid #ffffff !important;
   }
 }
 
@@ -208,6 +260,21 @@ kbd {
   animation:
     ghost-bob 0.8s ease-in-out infinite,
     ghost-flash 0.4s steps(2, end) infinite;
+}
+
+/* ===== GAME OVER SCREEN ANIMATIONS ===== */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 40px 12px currentColor,
+      0 0 80px 20px currentColor;
+  }
+  50% {
+    box-shadow:
+      0 0 30px 8px currentColor,
+      0 0 60px 15px currentColor;
+  }
 }
 
 /* Désactiver les transitions coûteuses sur mobile */

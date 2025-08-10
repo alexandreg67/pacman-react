@@ -294,7 +294,7 @@ export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => 
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
 
-        {/* Game Over Screen */}
+        {/* Overlay opaque + modale centrée sur la board */}
         {state.gameStatus === 'game-over' && onRestart && (
           <GameOverScreen
             score={state.score}

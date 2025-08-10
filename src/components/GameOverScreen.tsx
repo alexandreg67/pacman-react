@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useRef } from 'react'
 
 type Props = {
   score: number
@@ -35,6 +35,8 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
   const [isNewRecord, setIsNewRecord] = useState(false)
   const [bestScore, setBestScoreState] = useState(0)
   const [showAnimation, setShowAnimation] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const restartButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const currentBest = getBestScore()
@@ -66,6 +68,35 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
+  // Focus trap and focus management
+  useEffect(() => {
+    // Focus the restart button after animation
+    const focusTimer = setTimeout(() => {
+      restartButtonRef.current?.focus()
+    }, 500)
+
+    // Handle Tab key for focus trap
+    const handleTabKey = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        // Only focusable element is the restart button, so just prevent Tab from going elsewhere
+        event.preventDefault()
+        restartButtonRef.current?.focus()
+      }
+      if (event.key === 'Escape') {
+        // Escape key also restarts the game
+        event.preventDefault()
+        onRestart()
+      }
+    }
+
+    document.addEventListener('keydown', handleTabKey)
+
+    return () => {
+      clearTimeout(focusTimer)
+      document.removeEventListener('keydown', handleTabKey)
+    }
+  }, [onRestart])
+
   const formatTime = (seconds?: number): string => {
     if (!seconds) return 'N/A'
     const mins = Math.floor(seconds / 60)
@@ -75,25 +106,37 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
 
   return (
     <div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      ref={dialogRef}
+      className="w-full h-full flex items-center justify-center p-4"
       role="dialog"
+      aria-modal="true"
       aria-labelledby="game-over-title"
       aria-describedby="final-score"
     >
       <div
         className={`
-          relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
-          border-4 ${isNewRecord ? 'border-yellow-400 shadow-lg shadow-yellow-400/30' : 'border-cyan-400 shadow-lg shadow-cyan-400/30'}
-          rounded-3xl p-10 text-center w-full max-w-2xl
-          shadow-2xl transition-all duration-700 ease-out
-          ${
-            showAnimation
-              ? 'scale-100 opacity-100 transform translate-y-0'
-              : 'scale-75 opacity-0 transform translate-y-8'
-          }
-          before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-600/10 before:via-purple-600/10 before:to-pink-600/10 before:rounded-3xl before:-z-10
+          relative bg-black bg-opacity-90
+          border-4 ${isNewRecord ? 'border-yellow-400 animate-glow-pulse' : 'border-cyan-400 animate-glow-pulse'}
+          rounded-3xl p-8 md:p-10 text-center w-full max-w-2xl
+          shadow-2xl transition-all duration-700 ease-out transform
+          ${showAnimation ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}
         `}
+        style={{
+          color: isNewRecord ? '#fbbf24' : '#22d3ee',
+        }}
       >
+        {/* Decorative corner elements */}
+        <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-yellow-400 rounded-tl-lg"></div>
+        <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-yellow-400 rounded-tr-lg"></div>
+        <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-yellow-400 rounded-bl-lg"></div>
+        <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-yellow-400 rounded-br-lg"></div>
+
+        {/* Animated background elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-3xl -z-10">
+          <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-yellow-400 rounded-full animate-ping opacity-20"></div>
+          <div className="absolute top-3/4 right-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20 animation-delay-1000"></div>
+          <div className="absolute top-1/2 left-3/4 w-4 h-4 bg-pink-400 rounded-full animate-ping opacity-10"></div>
+        </div>
         {/* New Record Banner */}
         {isNewRecord && (
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-6 py-2 rounded-full font-bold text-sm animate-bounce shadow-lg">
@@ -188,13 +231,15 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
         {/* Action Buttons */}
         <div className="space-y-6">
           <button
+            ref={restartButtonRef}
             onClick={onRestart}
-            className="relative w-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:from-green-400 hover:via-green-500 hover:to-green-600 text-white font-black py-5 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/30 focus:outline-none focus:ring-4 focus:ring-green-300 shadow-xl group overflow-hidden"
+            className="relative w-full bg-gradient-to-r from-yellow-500 via-pink-500 to-blue-600 hover:from-yellow-400 hover:via-pink-400 hover:to-blue-500 text-white font-black py-5 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_32px_8px_rgba(59,130,246,0.5)] focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-4 focus:ring-offset-black shadow-xl group overflow-hidden border-2 border-white/20"
             aria-label="Start a new game"
             autoFocus
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20 animate-pulse"></div>
-            <span className="relative z-10 text-2xl flex items-center justify-center gap-3 tracking-wide">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-pink-500/20 to-blue-600/20 animate-pulse"></div>
+            <div className="absolute inset-0 bg-[length:200%_100%] bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10 text-2xl flex items-center justify-center gap-3 tracking-wide font-bold">
               🎮 <span className="group-hover:animate-bounce">PLAY AGAIN</span> 🎮
             </span>
           </button>

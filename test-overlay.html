@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Overlay Positioning - Maze Container</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #111;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .scenario {
+            border: 2px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        .scenario h3 {
+            color: white;
+            margin: 0 0 15px 0;
+        }
+        
+        /* Simulation du conteneur maze actuel */
+        .maze-container {
+            position: relative;
+            width: 400px; /* Taille fixe du labyrinthe */
+            height: 300px; /* Taille fixe du labyrinthe */
+            background: #000;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        /* Simulation du viewport complet */
+        .full-viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        /* Overlay avec position absolute dans maze-container */
+        .overlay-in-maze {
+            position: absolute;
+            inset: 0; /* equivalent à top:0, right:0, bottom:0, left:0 */
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(2px);
+            z-index: 40;
+        }
+        
+        /* Overlay avec position absolute dans viewport complet */
+        .overlay-full-viewport {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(2px);
+            z-index: 40;
+        }
+        
+        /* Contenu centré dans l'overlay */
+        .modal-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 20px;
+        }
+        
+        .modal-box {
+            background: #1a1a1a;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+        }
+        
+        /* Simulation du labyrinthe dans le conteneur */
+        .maze-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    #2563eb 0px,
+                    #2563eb 2px,
+                    #000 2px,
+                    #000 20px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    #2563eb 0px,
+                    #2563eb 2px,
+                    #000 2px,
+                    #000 20px
+                );
+        }
+    </style>
+</head>
+<body>
+    <div class="scenario">
+        <h3>🔍 Problème actuel: Overlay limité au maze-container</h3>
+        <p style="color: #ccc;">L'overlay est positionné avec <code>absolute inset-0</code> dans le maze-container de taille fixe.</p>
+        
+        <div class="maze-container">
+            <div class="maze-grid"></div>
+            
+            <!-- Overlay limité au conteneur du labyrinthe -->
+            <div class="overlay-in-maze"></div>
+            <div class="modal-content">
+                <div class="modal-box">
+                    <h4>GAME OVER</h4>
+                    <p>Le fond semi-transparent ne couvre que la zone du labyrinthe</p>
+                    <p style="font-size: 0.9em; color: #fbbf24;">→ Impression de transparence car le reste de l'écran reste visible</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="scenario">
+        <h3>✅ Solution potentielle: Overlay sur tout le viewport</h3>
+        <p style="color: #ccc;">L'overlay devrait être positionné par rapport au viewport complet, pas seulement au maze-container.</p>
+        <p style="color: #fbbf24; font-size: 0.9em;">Cliquez sur la zone pour voir l'effet (simulation limitée dans cette démo)</p>
+        
+        <div style="position: relative; width: 500px; height: 400px; background: #111; border-radius: 8px;">
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <div class="maze-container">
+                    <div class="maze-grid"></div>
+                </div>
+            </div>
+            
+            <!-- Overlay couvrant toute la zone visible -->
+            <div class="overlay-full-viewport" onclick="this.style.display='none'"></div>
+            <div class="modal-content" onclick="document.querySelector('.overlay-full-viewport').style.display='none'">
+                <div class="modal-box">
+                    <h4>GAME OVER</h4>
+                    <p>Le fond semi-transparent couvre tout l'écran</p>
+                    <p style="font-size: 0.9em; color: #4ade80;">→ Vraie modalité, pas d'impression de transparence</p>
+                    <button style="margin-top: 10px; padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Cliquer pour fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="color: #ccc; max-width: 600px; text-align: center; margin-top: 20px;">
+        <h4 style="color: #fbbf24;">Diagnostic</h4>
+        <p><strong>Problème confirmé:</strong> L'overlay Game Over est positionné <code>absolute inset-0</code> à l'intérieur du <code>.maze-container</code> qui a une taille fixe (largeur × hauteur du labyrinthe uniquement).</p>
+        <p><strong>Conséquence:</strong> Le fond semi-transparent ne couvre que la zone du labyrinthe, laissant le reste de l'interface visible, créant une impression de "fausse transparence".</p>
+        <p><strong>Solution:</strong> L'overlay devrait être positionné par rapport à un conteneur parent qui couvre tout le viewport, ou utiliser <code>position: fixed</code> pour couvrir toute la fenêtre.</p>
+    </div>
+</body>
+</html>
