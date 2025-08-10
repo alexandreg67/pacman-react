@@ -27,9 +27,31 @@ export function isPacmanBlocked(grid: Grid, x: number, y: number): boolean {
  * Vérifie si un fantôme peut passer dans une cellule
  * (seuls les murs bloquent les fantômes, sauf en mode eaten)
  */
-export function isGhostBlocked(grid: Grid, x: number, y: number, isEaten: boolean): boolean {
+export function isGhostBlocked(
+  grid: Grid,
+  x: number,
+  y: number,
+  isEaten: boolean,
+  ghostX?: number,
+  ghostY?: number,
+): boolean {
   if (!inBounds(grid, x, y)) return true
+  const cell = grid[y][x]
   // Les fantômes en mode "eaten" (yeux) peuvent passer partout
-  if (isEaten) return false
-  return grid[y][x] === Cell.Wall
+  if (isEaten) return cell === Cell.Wall
+
+  // Pour les GhostDoor : permettre aux fantômes de sortir de la maison mais pas d'y entrer
+  if (cell === Cell.GhostDoor) {
+    // Vérifier si le fantôme est dans la zone de la maison (y >= 12 et y <= 16 environ)
+    // Si oui, il peut passer la porte pour sortir
+    // Si non, il ne peut pas passer la porte pour entrer
+    if (ghostX !== undefined && ghostY !== undefined) {
+      const isInsideHouse = ghostY >= 12 && ghostY <= 16 && ghostX >= 10 && ghostX <= 17
+      return !isInsideHouse
+    }
+    // Si on n'a pas les coordonnées, bloquer par sécurité
+    return true
+  }
+
+  return cell === Cell.Wall
 }

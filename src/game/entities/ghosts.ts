@@ -70,7 +70,8 @@ function getPossibleDirections(state: GameState, ghost: Ghost): Direction[] {
     if (nx < 0 || nx >= w) continue
 
     // Check if the ghost is blocked (depends on ghost mode)
-    if (isGhostBlocked(state.grid, nx, ny, ghost.mode === 'eaten')) continue
+    if (isGhostBlocked(state.grid, nx, ny, ghost.mode === 'eaten', ghost.pos.x, ghost.pos.y))
+      continue
 
     result.push(dir)
   }
@@ -186,7 +187,16 @@ export function stepGhosts(state: GameState): GameState {
     const finalX = wrappedX
     const finalY = rawY
     // Check if the ghost is blocked
-    if (isGhostBlocked(state.grid, finalX, finalY, currentGhost.mode === 'eaten'))
+    if (
+      isGhostBlocked(
+        state.grid,
+        finalX,
+        finalY,
+        currentGhost.mode === 'eaten',
+        currentGhost.pos.x,
+        currentGhost.pos.y,
+      )
+    )
       return currentGhost
     const moved: Ghost = {
       ...currentGhost,

@@ -2,9 +2,9 @@ import { Cell } from './types'
 import type { Grid, SpawnInfo } from './types'
 
 // Demo map (small) — characters legend:
-// # = Wall, . = Pellet, o = Power pellet, space = Empty, P = Pacman spawn
+// # = Wall, . = Pellet, o = Power pellet, space = Empty, P = Pacman spawn, = = Ghost door
 // Classic-like 28x31 maze (simplified ASCII). Legend:
-// # wall, . pellet, o power pellet, P spawn, space = empty
+// # wall, . pellet, o power pellet, P spawn, space = empty, = ghost door
 // Note: This is a stylistic approximation, not a verbatim ROM map.
 export const CLASSIC_MAP: string[] = [
   '############################',
@@ -19,7 +19,7 @@ export const CLASSIC_MAP: string[] = [
   '######.##### ## #####.######',
   '     #.##### ## #####.#     ',
   '     #.##          ##.#     ',
-  '     #.## ###  ### ##.#     ',
+  '     #.## ###==### ##.#     ',
   '######.## #      # ##.######',
   '      .   #      #   .      ',
   '######.## #      # ##.######',
@@ -59,6 +59,9 @@ export function parseMap(lines: string[]): { grid: Grid; spawn: SpawnInfo } {
         case 'P':
           row.push(Cell.Empty)
           spawn = { pacman: { x, y } }
+          break
+        case '=':
+          row.push(Cell.GhostDoor)
           break
         default:
           row.push(Cell.Empty)
