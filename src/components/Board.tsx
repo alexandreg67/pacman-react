@@ -3,12 +3,10 @@ import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
 import { Ghost } from './Ghost'
-import { GameOverScreen } from './GameOverScreen'
 
 type Props = {
   state: GameState
   tileSize?: number
-  onRestart?: () => void
 }
 
 interface WallNeighbors {
@@ -177,7 +175,7 @@ const PacmanRenderer = React.memo(
   ),
 )
 
-export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => {
+export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
   const h = state.grid.length
   const w = state.grid[0]?.length ?? 0
 
@@ -294,7 +292,8 @@ export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => 
         {/* Éclairage ambiant simplifié */}
         <div className="absolute inset-0 pointer-events-none" style={ambientLighting} />
 
-        {/* Overlay opaque + modale centrée sur la board */}
+        {/* Overlay opaque - modale déplacée dans App.tsx pour un centrage correct */}
+        {/* 
         {state.gameStatus === 'game-over' && onRestart && (
           <GameOverScreen
             score={state.score}
@@ -307,6 +306,7 @@ export const Board = React.memo(({ state, tileSize = 28, onRestart }: Props) => 
             }
           />
         )}
+        */}
       </div>
 
       {/* Game Info UI */}
