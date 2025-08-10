@@ -28,6 +28,10 @@ describe('Pacman movement and consumption', () => {
   it('does not move through walls', () => {
     let s = initialState()
 
+    // Désactiver les fantômes pour ce test spécifique
+    // (éviter les collisions qui déclenchent handlePacmanDeath)
+    s = { ...s, ghosts: [] }
+
     // Place Pacman immediately to the right of a wall and attempt to move left
     let placed = false
     for (let y = 0; y < s.grid.length && !placed; y++) {
