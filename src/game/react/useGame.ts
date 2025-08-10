@@ -20,10 +20,8 @@ interface GameTiming {
   fps: number
   lastFpsUpdate: number
 }
-// ...existing code...
 
 // Vitesse fidèle à l'arcade
-// ...existing code...
 
 export function useGame() {
   const [state, setState] = useState<GameState>(() => initialState())
