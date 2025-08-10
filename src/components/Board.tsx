@@ -47,15 +47,20 @@ function cleanCacheIfNeeded() {
 }
 
 function getWallNeighbors(grid: Cell[][], x: number, y: number): WallNeighbors {
+  const h = grid.length
+  const w = grid[0]?.length ?? 0
+  // Helper pour vérifier les limites
+  const safe = (yy: number, xx: number) =>
+    yy >= 0 && yy < h && xx >= 0 && xx < w ? grid[yy][xx] === Cell.Wall : false
   return {
-    top: grid[y - 1]?.[x] === Cell.Wall,
-    topRight: grid[y - 1]?.[x + 1] === Cell.Wall,
-    right: grid[y]?.[x + 1] === Cell.Wall,
-    bottomRight: grid[y + 1]?.[x + 1] === Cell.Wall,
-    bottom: grid[y + 1]?.[x] === Cell.Wall,
-    bottomLeft: grid[y + 1]?.[x - 1] === Cell.Wall,
-    left: grid[y]?.[x - 1] === Cell.Wall,
-    topLeft: grid[y - 1]?.[x - 1] === Cell.Wall,
+    top: safe(y - 1, x),
+    topRight: safe(y - 1, x + 1),
+    right: safe(y, x + 1),
+    bottomRight: safe(y + 1, x + 1),
+    bottom: safe(y + 1, x),
+    bottomLeft: safe(y + 1, x - 1),
+    left: safe(y, x - 1),
+    topLeft: safe(y - 1, x - 1),
   }
 }
 
