@@ -75,13 +75,24 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
 
   return (
     <div
-      className="absolute inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       role="dialog"
       aria-labelledby="game-over-title"
       aria-describedby="final-score"
     >
       <div
-        className={`bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-4 ${isNewRecord ? 'border-yellow-400 shadow-yellow-400/20' : 'border-blue-500'} rounded-2xl p-8 text-center max-w-lg mx-4 shadow-2xl transition-all duration-500 ${showAnimation ? 'animate-in zoom-in-95 slide-in-from-bottom-4' : 'scale-95 opacity-0'}`}
+        className={`
+          relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
+          border-4 ${isNewRecord ? 'border-yellow-400 shadow-lg shadow-yellow-400/30' : 'border-cyan-400 shadow-lg shadow-cyan-400/30'}
+          rounded-3xl p-10 text-center w-full max-w-2xl
+          shadow-2xl transition-all duration-700 ease-out
+          ${
+            showAnimation
+              ? 'scale-100 opacity-100 transform translate-y-0'
+              : 'scale-75 opacity-0 transform translate-y-8'
+          }
+          before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-600/10 before:via-purple-600/10 before:to-pink-600/10 before:rounded-3xl before:-z-10
+        `}
       >
         {/* New Record Banner */}
         {isNewRecord && (
@@ -91,75 +102,114 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
         )}
 
         {/* Game Over Title */}
-        <div className="mb-6">
-          <h1
-            id="game-over-title"
-            className="text-4xl md:text-5xl font-bold text-red-500 mb-3 tracking-wider animate-pulse"
-          >
-            GAME OVER
-          </h1>
-          <div className="w-32 h-1 bg-gradient-to-r from-red-500 to-red-400 mx-auto rounded-full"></div>
+        <div className="mb-8">
+          <div className="relative">
+            <h1
+              id="game-over-title"
+              className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent mb-4 tracking-widest animate-pulse drop-shadow-2xl"
+              style={{ textShadow: '0 0 20px rgba(239, 68, 68, 0.5)' }}
+            >
+              GAME OVER
+            </h1>
+            <div className="absolute inset-0 text-6xl md:text-7xl font-extrabold text-red-900/20 blur-sm -z-10 tracking-widest">
+              GAME OVER
+            </div>
+          </div>
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-red-500 to-red-400 rounded-full animate-pulse"></div>
+            <div className="text-red-400 text-2xl animate-bounce">💀</div>
+            <div className="w-16 h-1 bg-gradient-to-l from-transparent via-red-500 to-red-400 rounded-full animate-pulse"></div>
+          </div>
         </div>
 
         {/* Score Message */}
-        <div className="mb-6">
-          <p className="text-xl font-semibold text-green-400 mb-2">{getScoreMessage(score)}</p>
+        <div className="mb-8">
+          <p className="text-2xl font-bold text-green-400 mb-4 tracking-wide animate-pulse">
+            {getScoreMessage(score)}
+          </p>
         </div>
 
         {/* Score Display */}
-        <div className="mb-8">
-          <p className="text-gray-300 text-lg mb-2">Final Score</p>
-          <p
-            id="final-score"
-            className={`text-5xl md:text-6xl font-bold tabular-nums mb-4 ${isNewRecord ? 'text-yellow-400 animate-pulse' : 'text-yellow-400'}`}
-          >
-            {score.toLocaleString()}
-          </p>
+        <div className="mb-10">
+          <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-6 border-2 border-slate-600 shadow-inner">
+            <p className="text-cyan-300 text-xl mb-3 font-semibold tracking-wide">FINAL SCORE</p>
+            <div className="relative">
+              <p
+                id="final-score"
+                className={`text-7xl md:text-8xl font-black tabular-nums mb-4 ${
+                  isNewRecord
+                    ? 'bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent animate-pulse'
+                    : 'bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent'
+                }`}
+                style={{
+                  textShadow: isNewRecord
+                    ? '0 0 30px rgba(251, 191, 36, 0.6)'
+                    : '0 0 30px rgba(34, 211, 238, 0.4)',
+                }}
+              >
+                {score.toLocaleString()}
+              </p>
+              {isNewRecord && (
+                <div className="absolute inset-0 text-7xl md:text-8xl font-black tabular-nums text-yellow-600/20 blur-sm animate-pulse">
+                  {score.toLocaleString()}
+                </div>
+              )}
+            </div>
 
-          {bestScore > 0 && !isNewRecord && (
-            <p className="text-gray-400 text-sm">
-              Best: <span className="text-yellow-300 font-bold">{bestScore.toLocaleString()}</span>
-            </p>
-          )}
+            {bestScore > 0 && !isNewRecord && (
+              <p className="text-slate-300 text-lg">
+                Previous Best:{' '}
+                <span className="text-yellow-300 font-bold text-xl">
+                  {bestScore.toLocaleString()}
+                </span>
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Game Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-8 text-sm">
-          <div className="bg-gray-800/50 rounded-lg p-3">
-            <p className="text-gray-400 mb-1">Level</p>
-            <p className="text-blue-400 font-bold text-lg">{level}</p>
+        <div className="grid grid-cols-2 gap-6 mb-10">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-600 shadow-lg transform hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-center mb-2">
+              <span className="text-3xl">🏆</span>
+            </div>
+            <p className="text-slate-400 text-sm mb-2 uppercase tracking-wider">Level Reached</p>
+            <p className="text-cyan-400 font-black text-3xl">{level}</p>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3">
-            <p className="text-gray-400 mb-1">Time</p>
-            <p className="text-blue-400 font-bold text-lg">{formatTime(timeElapsed)}</p>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-600 shadow-lg transform hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-center mb-2">
+              <span className="text-3xl">⏱️</span>
+            </div>
+            <p className="text-slate-400 text-sm mb-2 uppercase tracking-wider">Time Played</p>
+            <p className="text-cyan-400 font-black text-3xl">{formatTime(timeElapsed)}</p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <button
             onClick={onRestart}
-            className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-blue-500/25 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg group"
+            className="relative w-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:from-green-400 hover:via-green-500 hover:to-green-600 text-white font-black py-5 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/30 focus:outline-none focus:ring-4 focus:ring-green-300 shadow-xl group overflow-hidden"
             aria-label="Start a new game"
             autoFocus
           >
-            <span className="text-xl flex items-center justify-center gap-2">
-              🎮 <span className="group-hover:animate-pulse">Play Again</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20 animate-pulse"></div>
+            <span className="relative z-10 text-2xl flex items-center justify-center gap-3 tracking-wide">
+              🎮 <span className="group-hover:animate-bounce">PLAY AGAIN</span> 🎮
             </span>
           </button>
 
-          <div className="text-gray-400 text-sm flex items-center justify-center gap-4">
-            <p className="flex items-center gap-2">
-              Press{' '}
-              <kbd className="bg-gray-700 px-2 py-1 rounded text-xs border border-gray-600">
-                Enter
-              </kbd>{' '}
-              or{' '}
-              <kbd className="bg-gray-700 px-2 py-1 rounded text-xs border border-gray-600">
-                Space
-              </kbd>{' '}
-              to restart
-            </p>
+          <div className="flex items-center justify-center gap-6 text-slate-400 text-lg">
+            <div className="flex items-center gap-2">
+              <span>Press</span>
+              <kbd className="bg-slate-700 px-3 py-2 rounded-lg text-cyan-300 border-2 border-slate-600 shadow-lg font-bold">
+                ENTER
+              </kbd>
+              <span>or</span>
+              <kbd className="bg-slate-700 px-3 py-2 rounded-lg text-cyan-300 border-2 border-slate-600 shadow-lg font-bold">
+                SPACE
+              </kbd>
+            </div>
           </div>
         </div>
       </div>
