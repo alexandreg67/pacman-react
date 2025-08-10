@@ -1,6 +1,11 @@
 {
   "permissions": {
-    "allow": ["Bash(gh pr create:*)", "WebFetch(domain:pacmancode.com)"],
+    "allow": [
+      "Bash(gh pr create:*)",
+      "WebFetch(domain:pacmancode.com)",
+      "WebFetch(domain:pacman.fandom.com)",
+      "WebFetch(domain:www.gamedeveloper.com)"
+    ],
     "deny": []
   }
 }

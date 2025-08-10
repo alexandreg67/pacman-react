@@ -114,9 +114,25 @@ const Wall = React.memo(
 
 // Composant Path mémorisé
 const PathCell = React.memo(({ cell, tileSize }: { cell: Cell; tileSize: number }) => (
-  <div className="path-segment" style={{ width: tileSize, height: tileSize }}>
+  <div className="path-segment" style={{ width: tileSize, height: tileSize, position: 'relative' }}>
     {cell === Cell.Pellet && <div className="pellet-dot" />}
     {cell === Cell.PowerPellet && <div className="power-pellet" />}
+    {cell === Cell.GhostDoor && (
+      <div
+        className="ghost-door"
+        style={{
+          width: '80%',
+          height: '3px',
+          backgroundColor: '#ffffff',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '2px',
+          boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)',
+        }}
+      />
+    )}
   </div>
 ))
 

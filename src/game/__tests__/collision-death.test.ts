@@ -49,7 +49,7 @@ describe('Ghost-Pacman Collision and Death', () => {
 
       // Vérifier que les fantômes sont revenus à leurs positions initiales
       const expectedPositions = [
-        { x: 13, y: 11 }, // blinky
+        { x: 13, y: 9 }, // blinky
         { x: 13, y: 14 }, // pinky
         { x: 11, y: 14 }, // inky
         { x: 15, y: 14 }, // clyde

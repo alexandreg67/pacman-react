@@ -36,7 +36,7 @@ export function initialState(): GameState {
     ghosts: [
       {
         id: 'blinky',
-        pos: { x: 13, y: 11 },
+        pos: { x: 13, y: 9 },
         dir: 'left',
         mode: 'scatter',
         inPen: false,
@@ -112,7 +112,7 @@ export function handlePacmanDeath(state: GameState): GameState {
     // Remettre les fantômes à leurs positions initiales
     ghosts: state.ghosts.map((ghost, index) => {
       const initialPositions = [
-        { x: 13, y: 11, inPen: false }, // blinky
+        { x: 13, y: 9, inPen: false }, // blinky
         { x: 13, y: 14, inPen: true }, // pinky
         { x: 11, y: 14, inPen: true }, // inky
         { x: 15, y: 14, inPen: true }, // clyde

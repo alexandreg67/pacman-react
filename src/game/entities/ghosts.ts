@@ -1,5 +1,5 @@
 import type { Direction, GameState, Ghost } from '../types'
-import { isWall } from '../logic/collision'
+import { isWall, isGhostBlocked } from '../logic/collision'
 import { getCurrentGlobalMode } from '../logic/ghostModes'
 import { getTargetTileForGhost } from '../logic/ghostAi'
 import { shouldReleaseGhost } from '../logic/ghostHouse'
@@ -69,8 +69,8 @@ function getPossibleDirections(state: GameState, ghost: Ghost): Direction[] {
     if (ny < 0 || ny >= h) continue
     if (nx < 0 || nx >= w) continue
 
-    // Eaten ghosts (eyes only) can pass through walls to return to the house
-    if (ghost.mode !== 'eaten' && isWall(state.grid, nx, ny)) continue
+    // Check if the ghost is blocked (depends on ghost mode)
+    if (isGhostBlocked(state.grid, nx, ny, ghost.mode === 'eaten')) continue
 
     result.push(dir)
   }
@@ -168,21 +168,8 @@ export function stepGhosts(state: GameState): GameState {
     }
     // Release from pen if conditions met
     if (currentGhost.inPen && shouldReleaseGhost(state, currentGhost)) {
-      // Kick ghost one tile upward toward the door when releasing if possible
-      const door = getTargetTileForGhost(state, currentGhost)
-      const dy = currentGhost.pos.y > door.y ? -1 : 0
-      const nx = currentGhost.pos.x
-      const ny = currentGhost.pos.y + dy
-      if (!isWall(state.grid, nx, ny)) {
-        currentGhost = {
-          ...currentGhost,
-          inPen: false,
-          pos: { x: nx, y: ny },
-          dir: dy < 0 ? 'up' : currentGhost.dir,
-        }
-      } else {
-        currentGhost = { ...currentGhost, inPen: false }
-      }
+      // Simply release the ghost and let normal movement AI handle pathfinding to door
+      currentGhost = { ...currentGhost, inPen: false }
     }
     // Phase 2: use per-ghost targeting based on modes
     const target = getTargetTileForGhost(state, currentGhost)
@@ -198,8 +185,9 @@ export function stepGhosts(state: GameState): GameState {
     const { x: wrappedX, wrapped } = handleHorizontalWrapForGhost(state, rawX, rawY)
     const finalX = wrappedX
     const finalY = rawY
-    // Eaten ghosts can pass through walls, others cannot
-    if (currentGhost.mode !== 'eaten' && isWall(state.grid, finalX, finalY)) return currentGhost
+    // Check if the ghost is blocked
+    if (isGhostBlocked(state.grid, finalX, finalY, currentGhost.mode === 'eaten'))
+      return currentGhost
     const moved: Ghost = {
       ...currentGhost,
       pos: { x: finalX, y: finalY },

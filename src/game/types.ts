@@ -6,6 +6,7 @@ export const Cell = {
   Wall: 'Wall',
   Pellet: 'Pellet',
   PowerPellet: 'PowerPellet',
+  GhostDoor: 'GhostDoor', // Porte que seuls les fantômes peuvent traverser
 } as const
 export type Cell = (typeof Cell)[keyof typeof Cell]
 

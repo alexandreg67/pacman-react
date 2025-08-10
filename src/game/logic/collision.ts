@@ -12,3 +12,24 @@ export function isWall(grid: Grid, x: number, y: number): boolean {
   if (!inBounds(grid, x, y)) return true
   return grid[y][x] === Cell.Wall
 }
+
+/**
+ * Vérifie si Pac-Man peut passer dans une cellule
+ * (les murs et les portes des fantômes bloquent Pac-Man)
+ */
+export function isPacmanBlocked(grid: Grid, x: number, y: number): boolean {
+  if (!inBounds(grid, x, y)) return true
+  const cell = grid[y][x]
+  return cell === Cell.Wall || cell === Cell.GhostDoor
+}
+
+/**
+ * Vérifie si un fantôme peut passer dans une cellule
+ * (seuls les murs bloquent les fantômes, sauf en mode eaten)
+ */
+export function isGhostBlocked(grid: Grid, x: number, y: number, isEaten: boolean): boolean {
+  if (!inBounds(grid, x, y)) return true
+  // Les fantômes en mode "eaten" (yeux) peuvent passer partout
+  if (isEaten) return false
+  return grid[y][x] === Cell.Wall
+}

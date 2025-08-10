@@ -8,12 +8,12 @@ describe('Corrected Movement Logic', () => {
 
       // Verify blinky's initial state and target
       const blinky = state.ghosts.find((g) => g.id === 'blinky')!
-      expect(blinky.pos).toEqual({ x: 13, y: 11 })
+      expect(blinky.pos).toEqual({ x: 13, y: 9 })
       expect(blinky.dir).toBe('left')
       expect(blinky.inPen).toBe(false)
 
       // Blinky should target top-right corner (27, 0) in scatter mode
-      // To reach (27, 0) from (13, 11), best direction is RIGHT (even though it's reverse of LEFT)
+      // To reach (27, 0) from (13, 9), best direction is RIGHT (even though it's reverse of LEFT)
     })
 
     it('should provide at least one safe movement direction for Pacman', () => {
@@ -88,7 +88,7 @@ describe('Corrected Movement Logic', () => {
       // Test movement in UP direction to see if collision occurs
       const upResult = step(state, 'up')
       // Based on current spawn positions, UP movement may not immediately collide
-      // Pacman is at (15, 26) and blinky at (13, 11), so UP movement may be safe
+      // Pacman is at (15, 26) and blinky at (13, 9), so UP movement may be safe
       expect(upResult.lives).toBe(3) // Should not die from first UP movement
       expect(upResult.deathAnimationTicks).toBe(0) // No death animation
 

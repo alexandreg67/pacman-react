@@ -1,5 +1,5 @@
 import type { Direction, GameState } from '../types'
-import { isWall } from '../logic/collision'
+import { isWall, isPacmanBlocked } from '../logic/collision'
 
 export function dirToDelta(dir: Direction): { dx: number; dy: number } {
   switch (dir) {
@@ -98,8 +98,8 @@ export function attemptMove(state: GameState, inputDir: Direction): GameState {
     const finalX = wrappedX
     const finalY = wrappedY
 
-    // Vérification finale des collisions
-    if (isWall(state.grid, finalX, finalY)) return null
+    // Vérification finale des collisions (murs et portes des fantômes bloquent Pac-Man)
+    if (isPacmanBlocked(state.grid, finalX, finalY)) return null
 
     // Retourner le nouvel état avec info de wrap pour optimisations UI
     return { ...state, pacman: { x: finalX, y: finalY }, dir, justWrapped: wrapped }
