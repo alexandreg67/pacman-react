@@ -4,7 +4,8 @@
       "Bash(gh pr create:*)",
       "WebFetch(domain:pacmancode.com)",
       "WebFetch(domain:pacman.fandom.com)",
-      "WebFetch(domain:www.gamedeveloper.com)"
+      "WebFetch(domain:www.gamedeveloper.com)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": []
   }
