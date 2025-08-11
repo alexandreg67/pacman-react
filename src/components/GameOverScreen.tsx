@@ -1,4 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { Z_INDEX } from '../constants/zIndex'
 
 type Props = {
   score: number
@@ -103,7 +105,7 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -114,11 +116,24 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
           transition-opacity duration-300
           ${showAnimation ? 'opacity-100' : 'opacity-0'}
       `}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        margin: 0,
+        padding: '1rem',
+        zIndex: Z_INDEX.GAME_OVER_MODAL,
+      }}
     >
       <div
         className={`
           relative game-over-modal
-          p-6 md:p-8 text-center w-full max-w-lg
+          p-6 md:p-8 text-center max-w-lg
           transition-all duration-500 ease-out transform
           ${showAnimation ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}
         `}
@@ -227,7 +242,8 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 })
 
