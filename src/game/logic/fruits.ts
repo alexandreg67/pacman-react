@@ -76,7 +76,10 @@ export function expireFruits(state: GameState): GameState {
   const s = state as FruitCapableState
   if (!s.fruits || s.fruits.length === 0) return state
   const filtered = s.fruits.filter(
-    (f) => f.collected || state.tickCount - f.spawnedAtTick <= FRUIT_LIFETIME_TICKS,
+    (f) =>
+      f.collected ||
+      ('spawnedAtTick' in f &&
+        state.tickCount - (f as FruitInstance).spawnedAtTick <= FRUIT_LIFETIME_TICKS),
   )
   if (filtered.length === s.fruits.length) return state
   return { ...state, fruits: filtered }

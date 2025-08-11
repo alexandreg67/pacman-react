@@ -4,6 +4,7 @@ import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
+import hudStyles from './components/Hud.module.css'
 
 // Mémorisation des styles statiques
 const APP_STYLES = {
@@ -12,10 +13,6 @@ const APP_STYLES = {
   header: 'w-full flex flex-col items-center gap-3',
   title:
     'text-4xl md:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_2px_8px_rgba(234,179,8,0.25)] font-mono tracking-wider',
-  stats:
-    'flex flex-wrap items-center justify-center gap-4 md:gap-6 text-base md:text-lg font-mono text-white bg-gradient-to-r from-slate-900/70 to-slate-800/70 backdrop-blur-md rounded-xl px-4 md:px-6 py-3 md:py-4 shadow-lg ring-1 ring-white/10',
-  statItem:
-    'flex items-baseline gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-lg px-3 py-2 ring-1 ring-white/10',
   main: 'relative',
   overlay: 'absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg',
   overlayContent: 'text-center text-white',
@@ -46,31 +43,31 @@ const GameStats = React.memo(
     pelletsRemaining: number
     level: number
   }) => (
-    <div className={APP_STYLES.stats}>
-      <div className={APP_STYLES.statItem} aria-label="score">
-        <span className="text-xs uppercase tracking-wide text-slate-300">Score</span>
-        <span className="text-yellow-300 font-extrabold md:text-xl tabular-nums">
+    <div className={hudStyles.hudContainer}>
+      <div className={hudStyles.statItem} aria-label="score">
+        <span className={hudStyles.statLabel}>Score</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.scoreValue}`}>
           {score.toLocaleString()}
         </span>
       </div>
-      <div className={APP_STYLES.statItem} aria-label="level">
-        <span className="text-xs uppercase tracking-wide text-slate-300">Level</span>
-        <span className="text-emerald-300 font-extrabold md:text-xl">{level}</span>
+      <div className={hudStyles.statItem} aria-label="level">
+        <span className={hudStyles.statLabel}>Level</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.levelValue}`}>{level}</span>
       </div>
-      <div className={APP_STYLES.statItem} aria-label="lives">
-        <span className="text-xs uppercase tracking-wide text-slate-300">Lives</span>
-        <span className="flex items-center gap-1 text-red-300 font-extrabold md:text-xl">
+      <div className={hudStyles.statItem} aria-label="lives">
+        <span className={hudStyles.statLabel}>Lives</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.livesContainer}`}>
           {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
             <span key={i} role="img" aria-label={`life-${i + 1}`}>
               ❤️
             </span>
           ))}
-          {lives === 0 && <span className="text-red-500 text-xs font-bold">GAME OVER</span>}
+          {lives === 0 && <span className={hudStyles.gameOver}>GAME OVER</span>}
         </span>
       </div>
-      <div className={APP_STYLES.statItem} aria-label="pellets">
-        <span className="text-xs uppercase tracking-wide text-slate-300">Pellets</span>
-        <span className="text-sky-300 font-extrabold md:text-xl tabular-nums">
+      <div className={hudStyles.statItem} aria-label="pellets">
+        <span className={hudStyles.statLabel}>Pellets</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.pelletsValue}`}>
           {pelletsRemaining}
         </span>
       </div>

@@ -1,8 +1,6 @@
 import type { GameState } from '../types'
 import { getScatterChaseSchedule, type ModeScheduleEntry } from './levels'
 
-export type ModeScheduleEntry = { mode: 'scatter' | 'chase'; durationTicks: number | -1 }
-
 // Approximate arcade schedule in seconds -> convert to ticks via ~80ms base step
 // We'll work in "ticks" directly and treat values as engine ticks. You can refine later.
 export function getModeSchedule(level: number): ModeScheduleEntry[] {
