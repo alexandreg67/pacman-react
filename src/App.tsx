@@ -4,16 +4,15 @@ import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
+import hudStyles from './components/Hud.module.css'
 
 // Mémorisation des styles statiques
 const APP_STYLES = {
   container: 'min-h-screen bg-black flex flex-col items-center justify-center p-4',
-  wrapper: 'relative z-10 flex flex-col items-center gap-6 max-w-4xl',
-  header: 'text-center',
-  title: 'text-4xl md:text-5xl font-bold text-yellow-400 mb-4 font-mono tracking-wider',
-  stats:
-    'flex flex-wrap items-center justify-center gap-6 text-lg font-mono text-white bg-blue-900/30 rounded-lg px-6 py-3',
-  statItem: 'flex items-center gap-2',
+  wrapper: 'relative z-10 flex flex-col items-center gap-6 max-w-5xl w-full',
+  header: 'w-full flex flex-col items-center gap-3',
+  title:
+    'text-4xl md:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_2px_8px_rgba(234,179,8,0.25)] font-mono tracking-wider',
   main: 'relative',
   overlay: 'absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg',
   overlayContent: 'text-center text-white',
@@ -37,23 +36,40 @@ const GameStats = React.memo(
     score,
     lives,
     pelletsRemaining,
+    level,
   }: {
     score: number
     lives: number
     pelletsRemaining: number
+    level: number
   }) => (
-    <div className={APP_STYLES.stats}>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-yellow-300">SCORE:</span>
-        <span className="text-white font-bold">{score.toLocaleString()}</span>
+    <div className={hudStyles.hudContainer}>
+      <div className={hudStyles.statItem} aria-label="score">
+        <span className={hudStyles.statLabel}>Score</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.scoreValue}`}>
+          {score.toLocaleString()}
+        </span>
       </div>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-red-300">LIVES:</span>
-        <span className="text-white font-bold">{'♥'.repeat(lives)}</span>
+      <div className={hudStyles.statItem} aria-label="level">
+        <span className={hudStyles.statLabel}>Level</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.levelValue}`}>{level}</span>
       </div>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-blue-300">PELLETS:</span>
-        <span className="text-white font-bold">{pelletsRemaining}</span>
+      <div className={hudStyles.statItem} aria-label="lives">
+        <span className={hudStyles.statLabel}>Lives</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.livesContainer}`}>
+          {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
+            <span key={i} role="img" aria-label={`life-${i + 1}`}>
+              ❤️
+            </span>
+          ))}
+          {lives === 0 && <span className={hudStyles.gameOver}>GAME OVER</span>}
+        </span>
+      </div>
+      <div className={hudStyles.statItem} aria-label="pellets">
+        <span className={hudStyles.statLabel}>Pellets</span>
+        <span className={`${hudStyles.statValue} ${hudStyles.pelletsValue}`}>
+          {pelletsRemaining}
+        </span>
       </div>
     </div>
   ),
@@ -154,8 +170,9 @@ function App() {
       score: state.score,
       lives: state.lives,
       pelletsRemaining: state.pelletsRemaining,
+      level: state.level,
     }),
-    [state.score, state.lives, state.pelletsRemaining],
+    [state.score, state.lives, state.pelletsRemaining, state.level],
   )
 
   // Vérification de completion de niveau

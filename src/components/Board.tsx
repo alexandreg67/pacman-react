@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
+import { getFruitPosition } from '../game/logic/fruits'
 import { Ghost } from './Ghost'
 
 type Props = {
@@ -268,6 +269,33 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
           isProtected={pacmanPosition.isProtected}
         />
 
+        {/* Fruit (if spawned and not collected) */}
+        {state.fruits?.some((f) => !f.collected) && (
+          <div
+            className="absolute"
+            style={{
+              transform: `translate(${getFruitPosition(state).x * tileSize}px, ${
+                getFruitPosition(state).y * tileSize
+              }px)`,
+              width: tileSize,
+              height: tileSize,
+              zIndex: 80,
+            }}
+            aria-label="fruit"
+          >
+            <div
+              style={{
+                width: tileSize * 0.7,
+                height: tileSize * 0.7,
+                backgroundColor: '#ff2d55',
+                borderRadius: '50% 50% 40% 40%',
+                margin: tileSize * 0.15,
+                boxShadow: '0 0 6px rgba(255,45,85,0.9)',
+              }}
+            />
+          </div>
+        )}
+
         {/* Ghosts (Phase 4 rendering) */}
         {state.ghosts?.map((g) => (
           <div
@@ -300,31 +328,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
         {/* Note: Game Over modal moved to App.tsx for proper viewport centering */}
       </div>
 
-      {/* Game Info UI */}
-      <div className="flex justify-between items-center w-full max-w-md">
-        <div className="text-white">
-          <span className="text-sm font-medium">Score: </span>
-          <span className="text-lg font-bold text-yellow-400 tabular-nums">
-            {state.score.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-white text-sm font-medium">Lives: </span>
-          <div className="flex gap-1">
-            {Array.from({ length: Math.max(0, state.lives) }).map((_, i) => (
-              <div
-                key={i}
-                className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs"
-                aria-label={`Life ${i + 1}`}
-              >
-                🟡
-              </div>
-            ))}
-            {state.lives === 0 && <span className="text-red-500 text-sm font-bold">GAME OVER</span>}
-          </div>
-        </div>
-      </div>
+      {/* Bottom HUD intentionally removed; single HUD is rendered in App header */}
     </div>
   )
 })
