@@ -6,6 +6,7 @@ import { consumeIfAny } from './logic/scoring'
 import { stepGhosts } from './entities/ghosts'
 import { advanceGlobalModeTimer, getModeSchedule } from './logic/ghostModes'
 import { INITIAL_GHOST_POSITIONS } from './logic/ghostHouse'
+import { expireFruits } from './logic/fruits'
 import { shouldAdvanceLevel, advanceLevel } from './logic/levelManager'
 
 export function initialState(): GameState {
@@ -190,5 +191,7 @@ export function step(state: GameState, inputDir?: Direction): GameState {
   // Phase 1: process ghosts movement (no-op if none)
   next = stepGhosts(next)
   next = tick(next)
+  // Phase 3: expire fruits after ticking
+  next = expireFruits(next)
   return next
 }

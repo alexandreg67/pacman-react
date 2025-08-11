@@ -1,6 +1,7 @@
 // Fruit spawning scaffolding; will be wired once level tables are populated
 import type { GameState } from '../types'
-export type FruitInstance = { spawnedAtPellets: number; collected: boolean }
+import { getLevelConfig } from './levels'
+export type FruitInstance = { spawnedAtPellets: number; spawnedAtTick: number; collected: boolean }
 
 export type FruitConfig = {
   name: string
@@ -33,7 +34,14 @@ export function registerFruitSpawn(state: GameState): GameState {
   const fruits: FruitInstance[] = s.fruits ?? []
   return {
     ...(s as GameState),
-    fruits: [...fruits, { spawnedAtPellets: state.pelletsRemaining, collected: false }],
+    fruits: [
+      ...fruits,
+      {
+        spawnedAtPellets: state.pelletsRemaining,
+        spawnedAtTick: state.tickCount,
+        collected: false,
+      },
+    ],
   }
 }
 
@@ -54,9 +62,22 @@ export function maybeCollectFruit(state: GameState): GameState {
   if (!onFruit) return state
   const idx = s.fruits.findIndex((f) => !f.collected)
   if (idx === -1) return state
-  // Score will be wired from LevelConfig later; placeholder value
-  const fruitScore = 100
+  // Score from LevelConfig (fallback 100)
+  const cfg = getLevelConfig(state.level)
+  const fruitScore = cfg?.scores.fruit ?? 100
   const updated = [...s.fruits]
   updated[idx] = { ...updated[idx]!, collected: true }
   return { ...state, fruits: updated, score: state.score + fruitScore }
+}
+
+const FRUIT_LIFETIME_TICKS = 120 // ~10s at 12 ticks/s
+
+export function expireFruits(state: GameState): GameState {
+  const s = state as FruitCapableState
+  if (!s.fruits || s.fruits.length === 0) return state
+  const filtered = s.fruits.filter(
+    (f) => f.collected || state.tickCount - f.spawnedAtTick <= FRUIT_LIFETIME_TICKS,
+  )
+  if (filtered.length === s.fruits.length) return state
+  return { ...state, fruits: filtered }
 }

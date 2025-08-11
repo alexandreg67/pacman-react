@@ -31,7 +31,7 @@ export const LEVELS: LevelConfig[] = [
       ({
         id,
         fruit: id === 1 ? 'cherry' : id === 2 ? 'strawberry' : id <= 4 ? 'orange' : 'fruit',
-        scores: { fruit: 0, ghostEatBase: 200 },
+        scores: { fruit: id === 1 ? 100 : id === 2 ? 300 : 500, ghostEatBase: 200 },
         frightenedMs: S(40 / 12),
         scatterChase: [
           { mode: 'scatter', ms: S(7) },
@@ -60,7 +60,7 @@ export const LEVELS: LevelConfig[] = [
       ({
         id,
         fruit: id <= 6 ? 'apple' : id <= 8 ? 'melon' : id <= 10 ? 'galaxian' : 'fruit',
-        scores: { fruit: 0, ghostEatBase: 200 },
+        scores: { fruit: id <= 6 ? 700 : id <= 8 ? 1000 : 2000, ghostEatBase: 200 },
         frightenedMs: S(30 / 12),
         scatterChase: [
           { mode: 'scatter', ms: S(5) },
