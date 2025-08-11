@@ -6,6 +6,7 @@ import { consumeIfAny } from './logic/scoring'
 import { stepGhosts } from './entities/ghosts'
 import { advanceGlobalModeTimer, getModeSchedule } from './logic/ghostModes'
 import { INITIAL_GHOST_POSITIONS } from './logic/ghostHouse'
+import { shouldAdvanceLevel, advanceLevel } from './logic/levelManager'
 
 export function initialState(): GameState {
   // Load the classic-like map by default
@@ -181,6 +182,10 @@ export function step(state: GameState, inputDir?: Direction): GameState {
   // Reset fright chain when not frightened
   if (next.frightenedTicks === 0 && next.frightChain !== 0) {
     next = { ...next, frightChain: 0 }
+  }
+  // If level cleared, advance to next level before moving ghosts/timers
+  if (shouldAdvanceLevel(next)) {
+    next = advanceLevel(next)
   }
   // Phase 1: process ghosts movement (no-op if none)
   next = stepGhosts(next)

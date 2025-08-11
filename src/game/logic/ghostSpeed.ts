@@ -1,4 +1,5 @@
 import type { GameState, Ghost } from '../types'
+import { getFrightenedDurationTicksFromLevels } from './levels'
 
 type LevelConfig = {
   pacmanMs: number
@@ -50,6 +51,8 @@ export function getPacmanStepMs(state: GameState): number {
 }
 
 export function getFrightenedDurationTicks(level: number): number {
+  const fromLevels = getFrightenedDurationTicksFromLevels(level)
+  if (typeof fromLevels === 'number') return fromLevels
   return getLevelConfig(level).frightenedDurationTicks
 }
 
