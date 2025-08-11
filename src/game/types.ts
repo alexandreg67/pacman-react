@@ -63,6 +63,8 @@ export type GameState = {
   frightChain: number
   dotsEaten: number
   elroy: { phase: 0 | 1 | 2 }
+  // Fruits (optional until fully implemented)
+  fruits?: { spawnedAtPellets: number; collected: boolean }[]
 }
 
 export const SCORES = {

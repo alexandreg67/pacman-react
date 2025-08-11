@@ -37,15 +37,21 @@ const GameStats = React.memo(
     score,
     lives,
     pelletsRemaining,
+    level,
   }: {
     score: number
     lives: number
     pelletsRemaining: number
+    level: number
   }) => (
     <div className={APP_STYLES.stats}>
       <div className={APP_STYLES.statItem}>
         <span className="text-yellow-300">SCORE:</span>
         <span className="text-white font-bold">{score.toLocaleString()}</span>
+      </div>
+      <div className={APP_STYLES.statItem}>
+        <span className="text-green-300">LEVEL:</span>
+        <span className="text-white font-bold">{level}</span>
       </div>
       <div className={APP_STYLES.statItem}>
         <span className="text-red-300">LIVES:</span>
@@ -154,8 +160,9 @@ function App() {
       score: state.score,
       lives: state.lives,
       pelletsRemaining: state.pelletsRemaining,
+      level: state.level,
     }),
-    [state.score, state.lives, state.pelletsRemaining],
+    [state.score, state.lives, state.pelletsRemaining, state.level],
   )
 
   // Vérification de completion de niveau

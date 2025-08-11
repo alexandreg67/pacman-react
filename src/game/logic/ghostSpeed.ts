@@ -1,4 +1,10 @@
 import type { GameState, Ghost } from '../types'
+import {
+  getElroyFromLevels,
+  getReleaseThresholdsFromLevels,
+  getSpeedsFromLevels,
+  getFrightenedDurationTicksFromLevels,
+} from './levels'
 import { getFrightenedDurationTicksFromLevels } from './levels'
 
 type LevelConfig = {
@@ -15,6 +21,23 @@ type LevelConfig = {
 }
 
 function getLevelConfig(level: number): LevelConfig {
+  // Prefer external LevelConfig speeds if present
+  const sp = getSpeedsFromLevels(level)
+  const elroy = getElroyFromLevels(level)
+  if (sp && elroy) {
+    return {
+      pacmanMs: sp.pacmanMs,
+      pacmanTunnelMs: sp.pacmanTunnelMs,
+      frightenedDurationTicks: getFrightenedDurationTicksFromLevels(level) ?? 40,
+      ghostStrideBase: sp.ghostStrideBase,
+      tunnelStrideDelta: sp.tunnelStrideDelta,
+      frightenedStrideDelta: sp.frightenedStrideDelta,
+      eatenStrideDelta: sp.eatenStrideDelta,
+      elroyPhase1Pellets: elroy.phase1,
+      elroyPhase2Pellets: elroy.phase2,
+      elroyStrideBonus: sp.elroyStrideBonus,
+    }
+  }
   if (level >= 5) {
     return {
       pacmanMs: 60,
@@ -51,8 +74,6 @@ export function getPacmanStepMs(state: GameState): number {
 }
 
 export function getFrightenedDurationTicks(level: number): number {
-  const fromLevels = getFrightenedDurationTicksFromLevels(level)
-  if (typeof fromLevels === 'number') return fromLevels
   return getLevelConfig(level).frightenedDurationTicks
 }
 
@@ -85,6 +106,14 @@ export function getReleaseThresholds(level: number): {
   inky: number
   clyde: number
 } {
+  const fromLevels = getReleaseThresholdsFromLevels(level)
+  if (fromLevels) {
+    return {
+      pinky: fromLevels.pinky ?? 0,
+      inky: fromLevels.inky ?? 0,
+      clyde: fromLevels.clyde ?? 0,
+    }
+  }
   if (level >= 5) {
     return { pinky: 0, inky: 20, clyde: 10 }
   }

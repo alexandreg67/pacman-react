@@ -1,6 +1,5 @@
 // Fruit spawning scaffolding; will be wired once level tables are populated
 import type { GameState } from '../types'
-
 export type FruitInstance = { spawnedAtPellets: number; collected: boolean }
 
 export type FruitConfig = {

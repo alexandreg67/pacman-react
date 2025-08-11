@@ -7,9 +7,17 @@ export interface LevelConfig {
   scores: { fruit: number; ghostEatBase: number }
   frightenedMs: number
   scatterChase: ScatterChasePhase[]
-  speeds: { pacman: number; ghost: number; frightened: number; tunnel: number }
+  speeds: {
+    pacmanMs: number
+    pacmanTunnelMs: number
+    ghostStrideBase: number
+    tunnelStrideDelta: number
+    frightenedStrideDelta: number
+    eatenStrideDelta: number
+    elroyStrideBonus: number
+  }
   dotRelease: { pinky?: number; inky?: number; clyde?: number }
-  elroy: { threshold: number; speed: number }
+  elroy: { phase1: number; phase2: number }
 }
 
 export const LEVELS: LevelConfig[] = []
@@ -36,4 +44,47 @@ export function getFrightenedDurationTicksFromLevels(level: number): number | un
   const cfg = getLevelConfig(level)
   if (!cfg) return undefined
   return Math.max(0, Math.round(cfg.frightenedMs / TICK_MS))
+}
+
+// Test helpers to inject level data without hardcoding tables yet
+export function __setLevels(levels: LevelConfig[]): void {
+  LEVELS.splice(0, LEVELS.length, ...levels)
+}
+
+export function __resetLevels(): void {
+  LEVELS.splice(0, LEVELS.length)
+}
+
+export function getReleaseThresholdsFromLevels(
+  level: number,
+): { pinky?: number; inky?: number; clyde?: number } | undefined {
+  const cfg = getLevelConfig(level)
+  return cfg?.dotRelease
+}
+
+export function getElroyFromLevels(
+  level: number,
+): { phase1: number; phase2: number; strideBonus: number } | undefined {
+  const cfg = getLevelConfig(level)
+  if (!cfg) return undefined
+  return {
+    phase1: cfg.elroy.phase1,
+    phase2: cfg.elroy.phase2,
+    strideBonus: cfg.speeds.elroyStrideBonus,
+  }
+}
+
+export function getSpeedsFromLevels(level: number):
+  | {
+      pacmanMs: number
+      pacmanTunnelMs: number
+      ghostStrideBase: number
+      tunnelStrideDelta: number
+      frightenedStrideDelta: number
+      eatenStrideDelta: number
+      elroyStrideBonus: number
+    }
+  | undefined {
+  const cfg = getLevelConfig(level)
+  return cfg?.speeds
 }
