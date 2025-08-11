@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { Z_INDEX } from '../constants/zIndex'
 
 type Props = {
   score: number
@@ -124,10 +125,9 @@ export const GameOverScreen = React.memo(({ score, onRestart, level = 1, timeEla
         left: 0,
         right: 0,
         bottom: 0,
-        height: '100vh',
         margin: 0,
         padding: '1rem',
-        zIndex: 9999,
+        zIndex: Z_INDEX.GAME_OVER_MODAL,
       }}
     >
       <div

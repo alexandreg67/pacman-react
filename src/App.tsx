@@ -147,7 +147,8 @@ function App() {
     state.score,
     selectedMode,
     selectedLevel,
-    state,
+
+    // We don't need the entire state object, only specific properties listed above
   ])
 
   // Sauvegarder les statistiques en cas de game over

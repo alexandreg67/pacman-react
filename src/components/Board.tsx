@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { Z_INDEX } from '../constants/zIndex'
 import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
@@ -165,7 +166,7 @@ const PacmanRenderer = React.memo(
         transform: `translate(${x * tileSize}px, ${y * tileSize}px)`,
         width: tileSize,
         height: tileSize,
-        zIndex: 100,
+        zIndex: Z_INDEX.PACMAN,
         transition: justWrapped ? 'none' : 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
       aria-label="pacman"
@@ -279,7 +280,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
               }px)`,
               width: tileSize,
               height: tileSize,
-              zIndex: 80,
+              zIndex: Z_INDEX.FRUIT,
             }}
             aria-label="fruit"
           >
@@ -305,7 +306,7 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
               transform: `translate(${g.pos.x * tileSize}px, ${g.pos.y * tileSize}px)`,
               width: tileSize,
               height: tileSize,
-              zIndex: 90,
+              zIndex: Z_INDEX.GHOSTS,
               transition: g.justWrapped ? 'none' : 'transform 60ms cubic-bezier(0.4, 0.0, 0.2, 1)',
             }}
             aria-label={`ghost-${g.id}`}
