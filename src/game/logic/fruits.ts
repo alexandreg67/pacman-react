@@ -9,9 +9,9 @@ export type FruitConfig = {
   spawnThresholdsEaten: number[] // dotsEaten values at which fruit appears (twice per level)
 }
 
-export function getFruitConfigForLevel(level: number): FruitConfig | undefined {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getFruitConfigForLevel(_level: number): FruitConfig | undefined {
   // Placeholder: will be populated from levels.ts once data is available
-  void level
   return { name: 'cherry', score: 100, spawnThresholdsEaten: [70, 170] }
 }
 
@@ -76,10 +76,7 @@ export function expireFruits(state: GameState): GameState {
   const s = state as FruitCapableState
   if (!s.fruits || s.fruits.length === 0) return state
   const filtered = s.fruits.filter(
-    (f) =>
-      f.collected ||
-      ('spawnedAtTick' in f &&
-        state.tickCount - (f as FruitInstance).spawnedAtTick <= FRUIT_LIFETIME_TICKS),
+    (f) => f.collected || state.tickCount - f.spawnedAtTick <= FRUIT_LIFETIME_TICKS,
   )
   if (filtered.length === s.fruits.length) return state
   return { ...state, fruits: filtered }

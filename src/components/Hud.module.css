@@ -13,7 +13,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
-  max-width: 812px; /* Correspond à la largeur du plateau (28px * 29 cases) */
+  max-width: 812px; /* Matches board width (28px * 29 tiles) */
 }
 
 .statItem {
@@ -45,11 +45,11 @@
 }
 
 .scoreValue {
-  color: #fbbf24; /* Jaune doré */
+  color: #fbbf24; /* Golden yellow */
 }
 
 .levelValue {
-  color: #34d399; /* Vert émeraude */
+  color: #34d399; /* Emerald green */
 }
 
 .livesContainer {
@@ -59,11 +59,11 @@
 }
 
 .livesValue {
-  color: #f87171; /* Rouge clair */
+  color: #f87171; /* Light red */
 }
 
 .pelletsValue {
-  color: #60a5fa; /* Bleu clair */
+  color: #60a5fa; /* Light blue */
 }
 
 .gameOver {
