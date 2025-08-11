@@ -8,12 +8,14 @@ import { useGame } from './game/react/useGame'
 // Mémorisation des styles statiques
 const APP_STYLES = {
   container: 'min-h-screen bg-black flex flex-col items-center justify-center p-4',
-  wrapper: 'relative z-10 flex flex-col items-center gap-6 max-w-4xl',
-  header: 'text-center',
-  title: 'text-4xl md:text-5xl font-bold text-yellow-400 mb-4 font-mono tracking-wider',
+  wrapper: 'relative z-10 flex flex-col items-center gap-6 max-w-5xl w-full',
+  header: 'w-full flex flex-col items-center gap-3',
+  title:
+    'text-4xl md:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_2px_8px_rgba(234,179,8,0.25)] font-mono tracking-wider',
   stats:
-    'flex flex-wrap items-center justify-center gap-6 text-lg font-mono text-white bg-blue-900/30 rounded-lg px-6 py-3',
-  statItem: 'flex items-center gap-2',
+    'flex flex-wrap items-center justify-center gap-4 md:gap-6 text-base md:text-lg font-mono text-white bg-gradient-to-r from-slate-900/70 to-slate-800/70 backdrop-blur-md rounded-xl px-4 md:px-6 py-3 md:py-4 shadow-lg ring-1 ring-white/10',
+  statItem:
+    'flex items-baseline gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-lg px-3 py-2 ring-1 ring-white/10',
   main: 'relative',
   overlay: 'absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg',
   overlayContent: 'text-center text-white',
@@ -45,21 +47,32 @@ const GameStats = React.memo(
     level: number
   }) => (
     <div className={APP_STYLES.stats}>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-yellow-300">SCORE:</span>
-        <span className="text-white font-bold">{score.toLocaleString()}</span>
+      <div className={APP_STYLES.statItem} aria-label="score">
+        <span className="text-xs uppercase tracking-wide text-slate-300">Score</span>
+        <span className="text-yellow-300 font-extrabold md:text-xl tabular-nums">
+          {score.toLocaleString()}
+        </span>
       </div>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-green-300">LEVEL:</span>
-        <span className="text-white font-bold">{level}</span>
+      <div className={APP_STYLES.statItem} aria-label="level">
+        <span className="text-xs uppercase tracking-wide text-slate-300">Level</span>
+        <span className="text-emerald-300 font-extrabold md:text-xl">{level}</span>
       </div>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-red-300">LIVES:</span>
-        <span className="text-white font-bold">{'♥'.repeat(lives)}</span>
+      <div className={APP_STYLES.statItem} aria-label="lives">
+        <span className="text-xs uppercase tracking-wide text-slate-300">Lives</span>
+        <span className="flex items-center gap-1 text-red-300 font-extrabold md:text-xl">
+          {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
+            <span key={i} role="img" aria-label={`life-${i + 1}`}>
+              ❤️
+            </span>
+          ))}
+          {lives === 0 && <span className="text-red-500 text-xs font-bold">GAME OVER</span>}
+        </span>
       </div>
-      <div className={APP_STYLES.statItem}>
-        <span className="text-blue-300">PELLETS:</span>
-        <span className="text-white font-bold">{pelletsRemaining}</span>
+      <div className={APP_STYLES.statItem} aria-label="pellets">
+        <span className="text-xs uppercase tracking-wide text-slate-300">Pellets</span>
+        <span className="text-sky-300 font-extrabold md:text-xl tabular-nums">
+          {pelletsRemaining}
+        </span>
       </div>
     </div>
   ),
