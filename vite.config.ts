@@ -18,7 +18,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
-        // Cache strategy optimisée
+        // Optimized cache strategy
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -36,9 +36,9 @@ export default defineConfig({
     }),
   ],
 
-  // Optimisations de build
+  // Build optimizations
   build: {
-    // Chunks optimisés pour le cache
+    // Optimized chunks for caching
     rollupOptions: {
       output: {
         manualChunks: {
@@ -47,35 +47,35 @@ export default defineConfig({
         },
       },
     },
-    // Optimisations de performance
+    // Performance optimizations
     cssCodeSplit: true,
-    sourcemap: 'hidden', // Génère les sourcemaps sans les exposer aux utilisateurs
+    sourcemap: 'hidden', // Generate sourcemaps without exposing them to users
     minify: 'terser',
     terserOptions: {
       compress: {
-        // Supprimer uniquement les console.log en production, garder error/warn
+        // Remove only console.log in production, keep error/warn
         pure_funcs: ['console.log', 'console.debug'],
         drop_debugger: true,
       },
     },
-    // Taille limite optimisée
+    // Optimized size limit
     chunkSizeWarningLimit: 1000,
   },
 
-  // Optimisations CSS
+  // CSS optimizations
   css: {
     devSourcemap: true,
   },
 
-  // Optimisations du serveur de dev
+  // Dev server optimizations
   server: {
-    // Performance du HMR
+    // HMR performance
     hmr: {
-      overlay: false, // Désactiver l'overlay d'erreur pour de meilleures perfs
+      overlay: false, // Disable error overlay for better performance
     },
   },
 
-  // Optimisations de résolution
+  // Resolution optimizations
   resolve: {
     alias: {
       '@': '/src',
@@ -85,10 +85,10 @@ export default defineConfig({
     },
   },
 
-  // Optimisations des dépendances
+  // Dependency optimizations
   optimizeDeps: {
     include: ['react', 'react-dom'],
-    exclude: [], // Exclure des deps lourdes si nécessaire
+    exclude: [], // Exclude heavy deps if necessary
   },
 
   test: {
@@ -100,7 +100,7 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: ['node_modules/', 'src/setupTests.ts', '**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
     },
-    // Optimisations des tests
+    // Test optimizations
     pool: 'threads',
     poolOptions: {
       threads: {
