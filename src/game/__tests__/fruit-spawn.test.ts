@@ -25,7 +25,7 @@ describe('Fruit spawning (scaffolding)', () => {
       ...s,
       dotsEaten: 169,
       pelletsRemaining: s.pelletsRemaining + 1,
-      // @ts-expect-error augmenting with fruits until type extended
+      // augmenting with fruits until type extended
       fruits: [{ spawnedAtPellets: s.pelletsRemaining + 1, collected: false, spawnedAtTick: 0 }],
     }
     const next = consumeIfAny(s)

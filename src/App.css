@@ -1,5 +1,8 @@
 /* CSS Optimisé pour Performance - Pacman Game */
 
+/* Import des styles rétro-gaming */
+@import './styles/retro.css';
+
 /* Variables de base simplifiées */
 :root {
   --wall-color: #2563eb;

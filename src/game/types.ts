@@ -34,6 +34,18 @@ export type Ghost = {
 
 export type GameStatus = 'playing' | 'game-over' | 'paused'
 
+// Modes de jeu
+export type GameMode = 'classic' | 'easy' | 'hard' | 'speedrun' | 'survival'
+
+export type GameConfig = {
+  mode: GameMode
+  selectedLevel?: number
+  ghostSpeedModifier: number
+  powerPelletDuration: number
+  scatterDuration: number
+  // ... autres paramètres
+}
+
 export type GameState = {
   grid: Grid
   pacman: Vec
@@ -64,7 +76,7 @@ export type GameState = {
   dotsEaten: number
   elroy: { phase: 0 | 1 | 2 }
   // Fruits (optional until fully implemented)
-  fruits?: { spawnedAtPellets: number; collected: boolean }[]
+  fruits?: { spawnedAtPellets: number; spawnedAtTick: number; collected: boolean }[]
 }
 
 export const SCORES = {
