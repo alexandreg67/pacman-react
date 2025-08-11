@@ -1,14 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Direction, GameState } from '../types'
+import type { Direction, GameState, GameMode } from '../types'
 import { initialState, step } from '../state'
-// Vitesse fidèle à l'arcade
-function getPacmanSpeedMs(state: import('../types').GameState): number {
+import { adaptGameStateForMode, getGhostSpeedModifier } from '../modes/engine'
+// Vitesse fidèle à l'arcade avec adaptations par mode
+function getPacmanSpeedMs(state: GameState, mode: GameMode): number {
   // Tunnel: vitesse réduite (utilise la détection dynamique)
   const inTunnel = state.tunnelRows.includes(state.pacman.y)
-  if (inTunnel) return 90
-  // Niveau 1 à 4 : 80ms, niveau 5+ : 60ms
-  const level = Math.floor((state.score || 0) / 10000) + 1 // estimation simple
-  return level < 5 ? 80 : 60
+
+  // Base speed calculation
+  let baseSpeed: number
+  if (inTunnel) {
+    baseSpeed = 90
+  } else {
+    // Niveau 1 à 4 : 80ms, niveau 5+ : 60ms
+    const level = Math.floor((state.score || 0) / 10000) + 1
+    baseSpeed = level < 5 ? 80 : 60
+  }
+
+  // Apply mode-specific modifier
+  const speedModifier = getGhostSpeedModifier(mode)
+
+  // For survival mode, increase speed progressively with score
+  if (mode === 'survival') {
+    const survivalMultiplier = Math.max(0.5, 1 - (state.score / 50000) * 0.3)
+    baseSpeed *= survivalMultiplier
+  }
+
+  // For speedrun mode, slightly faster
+  if (mode === 'speedrun') {
+    baseSpeed *= 0.9
+  }
+
+  return Math.max(30, Math.round(baseSpeed / speedModifier))
 }
 
 const MAX_DELTA = 100 // Limite pour éviter les gros sauts
@@ -23,8 +46,8 @@ interface GameTiming {
 
 // Vitesse fidèle à l'arcade
 
-export function useGame() {
-  const [state, setState] = useState<GameState>(() => initialState())
+export function useGame(mode: GameMode = 'classic') {
+  const [state, setState] = useState<GameState>(() => initialState(mode))
   const animationFrameRef = useRef<number>(0)
   const stateRef = useRef<GameState>(state) // Ref pour accès au state sans dependency
   const timingRef = useRef<GameTiming>({
@@ -60,12 +83,16 @@ export function useGame() {
       timing.lastTime = currentTime
       timing.accumulator += deltaTime
 
-      // Vitesse variable selon le niveau et la position
-      const pacmanSpeedMs = getPacmanSpeedMs(stateRef.current)
+      // Vitesse variable selon le niveau, la position et le mode
+      const pacmanSpeedMs = getPacmanSpeedMs(stateRef.current, mode)
 
       let stepsThisFrame = 0
       while (timing.accumulator >= pacmanSpeedMs && stepsThisFrame < 3) {
-        setState((prevState) => step(prevState))
+        setState((prevState) => {
+          const newState = step(prevState)
+          // Apply mode-specific adaptations
+          return adaptGameStateForMode(newState, mode)
+        })
         timing.accumulator -= pacmanSpeedMs
         stepsThisFrame++
       }
@@ -83,7 +110,7 @@ export function useGame() {
       // Programmer le prochain frame
       animationFrameRef.current = requestAnimationFrame(gameLoop)
     },
-    [], // Pas de dépendances - utilise stateRef pour éviter les re-créations
+    [mode], // Mode dependency pour recalculer la vitesse
   )
 
   // Démarrer le game loop
@@ -104,22 +131,29 @@ export function useGame() {
   const lastInputRef = useRef<{ direction: Direction; time: number } | null>(null)
   const INPUT_DEBOUNCE = 50 // 50ms de debounce
 
-  const stepInput = useCallback((dir: Direction) => {
-    const now = Date.now()
+  const stepInput = useCallback(
+    (dir: Direction) => {
+      const now = Date.now()
 
-    // Debouncing des inputs
-    if (
-      lastInputRef.current &&
-      lastInputRef.current.direction === dir &&
-      now - lastInputRef.current.time < INPUT_DEBOUNCE
-    ) {
-      return
-    }
+      // Debouncing des inputs
+      if (
+        lastInputRef.current &&
+        lastInputRef.current.direction === dir &&
+        now - lastInputRef.current.time < INPUT_DEBOUNCE
+      ) {
+        return
+      }
 
-    lastInputRef.current = { direction: dir, time: now }
+      lastInputRef.current = { direction: dir, time: now }
 
-    setState((prev) => step(prev, dir))
-  }, [])
+      setState((prev) => {
+        const newState = step(prev, dir)
+        // Apply mode-specific adaptations
+        return adaptGameStateForMode(newState, mode)
+      })
+    },
+    [mode],
+  )
 
   // Reset optimisé avec nettoyage du timing
   const reset = useCallback(() => {
@@ -132,9 +166,9 @@ export function useGame() {
       lastFpsUpdate: 0,
     }
 
-    // Réinitialiser l'état du jeu
-    setState(initialState())
-  }, [])
+    // Réinitialiser l'état du jeu avec le mode sélectionné
+    setState(initialState(mode))
+  }, [mode])
 
   // Pause/Resume pour optimiser quand le jeu n'est pas visible
   const pause = useCallback(() => {

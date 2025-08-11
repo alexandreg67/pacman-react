@@ -1,10 +1,22 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ThemeToggle } from './components/ThemeToggle'
 import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
 import hudStyles from './components/Hud.module.css'
+import type { GameMode } from './game/types'
+import MainMenu from './components/MainMenu'
+import LevelSelector from './components/LevelSelector'
+import GameTimer from './components/GameTimer'
+import ArcadeButton from './components/ui/ArcadeButton'
+import LevelCompleteModal from './components/LevelCompleteModal'
+import { loadProgress, saveProgress, updateHighScore } from './game/storage/progress'
+import { calculateStarsFromGameState } from './game/logic/stars'
+import { loadStats, updateStats, saveStats } from './game/storage/stats'
+
+// États de l'application
+type AppScreen = 'main-menu' | 'level-selector' | 'game' | 'game-over'
 
 // Mémorisation des styles statiques
 const APP_STYLES = {
@@ -109,7 +121,20 @@ const GameInstructions = React.memo(() => (
 GameInstructions.displayName = 'GameInstructions'
 
 function App() {
-  const { state, stepInput, reset, restart } = useGame()
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('main-menu')
+  const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
+  const [selectedLevel, setSelectedLevel] = useState<number>(1)
+  const { state, stepInput, reset, restart } = useGame(selectedMode)
+
+  // Charger la progression au démarrage
+  useEffect(() => {
+    const progress = loadProgress()
+    // Vérifier s'il y a une partie sauvegardée
+    if (progress.lastPlayedMode && progress.lastPlayedLevel) {
+      // Pour l'instant, on reste sur le menu principal
+      // Plus tard, on pourrait proposer de reprendre la partie
+    }
+  }, [])
 
   // Mémorisation des handlers d'événements
   const handleKeyDown = useCallback(
@@ -178,52 +203,231 @@ function App() {
   // Vérification de completion de niveau
   const isLevelComplete = state.pelletsRemaining === 0
 
-  return (
-    <div className={APP_STYLES.container}>
-      {/* Performance Monitor retiré */}
+  // Sauvegarder la progression quand le niveau est terminé
+  useEffect(() => {
+    if (isLevelComplete && state.started && state.gameStartTime > 0) {
+      const timeElapsed = Date.now() - state.gameStartTime
+      const stars = calculateStarsFromGameState(selectedMode, selectedLevel, state, timeElapsed)
 
-      <div className={APP_STYLES.wrapper}>
-        {/* Header */}
-        <header className={APP_STYLES.header}>
-          <h1 className={APP_STYLES.title}>PAC-MAN</h1>
-          <GameStats {...gameStats} />
-        </header>
+      // Mettre à jour la progression
+      let progress = loadProgress()
+      progress = updateHighScore(progress, selectedMode, selectedLevel, state.score)
 
-        {/* Game Board */}
-        <main className={APP_STYLES.main}>
-          <Board {...boardProps} />
+      // Mettre à jour les étoiles
+      if (!progress.stars[selectedMode]) {
+        progress.stars[selectedMode] = {}
+      }
+      const currentStars = progress.stars[selectedMode][selectedLevel] || 0
+      if (stars > currentStars) {
+        progress.stars[selectedMode][selectedLevel] = stars
+      }
 
-          {/* Game completion overlay */}
-          {isLevelComplete && <LevelCompleteOverlay score={state.score} onReset={reset} />}
-        </main>
+      // Débloquer le niveau suivant
+      if (stars >= 1 && selectedLevel < 50) {
+        const nextLevel = selectedLevel + 1
+        if (!progress.unlockedLevels[selectedMode].includes(nextLevel)) {
+          progress.unlockedLevels[selectedMode].push(nextLevel)
+          progress.unlockedLevels[selectedMode].sort((a, b) => a - b)
+        }
+      }
 
-        {/* Controls */}
-        <footer className={APP_STYLES.footer}>
-          <div className={APP_STYLES.controls}>
-            <ThemeToggle />
-            <button onClick={reset} className={APP_STYLES.resetBtn}>
-              RESET (R)
-            </button>
+      saveProgress(progress)
+
+      // Mettre à jour les statistiques
+      const stats = loadStats()
+      const updatedStats = updateStats(
+        stats,
+        selectedMode,
+        state.score,
+        timeElapsed,
+        true, // isWin = true car niveau complété
+      )
+      saveStats(updatedStats)
+    }
+  }, [
+    isLevelComplete,
+    state.started,
+    state.gameStartTime,
+    state.score,
+    selectedMode,
+    selectedLevel,
+  ])
+
+  // Sauvegarder les statistiques en cas de game over
+  useEffect(() => {
+    if (state.gameStatus === 'game-over' && state.started && state.gameStartTime > 0) {
+      const timeElapsed = Date.now() - state.gameStartTime
+
+      // Mettre à jour les statistiques
+      const stats = loadStats()
+      const updatedStats = updateStats(
+        stats,
+        selectedMode,
+        state.score,
+        timeElapsed,
+        false, // isWin = false car game over
+      )
+      saveStats(updatedStats)
+    }
+  }, [state.gameStatus, state.started, state.gameStartTime, state.score, selectedMode])
+
+  // Handlers de navigation
+  const handleSelectMode = (mode: GameMode) => {
+    setSelectedMode(mode)
+    setCurrentScreen('level-selector')
+  }
+
+  const handleSelectLevel = (level: number) => {
+    setSelectedLevel(level)
+    setCurrentScreen('game')
+    // Sauvegarder le dernier mode/level joué
+    const progress = loadProgress()
+    progress.lastPlayedMode = selectedMode
+    progress.lastPlayedLevel = level
+    saveProgress(progress)
+    // Réinitialiser le jeu pour le nouveau mode/niveau
+    restart()
+  }
+
+  const handleBackToMenu = () => {
+    setCurrentScreen('main-menu')
+  }
+
+  const handleBackToLevelSelector = () => {
+    setCurrentScreen('level-selector')
+  }
+
+  const handleResumeGame = () => {
+    // Charger la partie sauvegardée
+    const progress = loadProgress()
+    if (progress.lastPlayedMode && progress.lastPlayedLevel) {
+      setSelectedMode(progress.lastPlayedMode)
+      setSelectedLevel(progress.lastPlayedLevel)
+      setCurrentScreen('game')
+      restart()
+    } else {
+      setCurrentScreen('main-menu')
+    }
+  }
+
+  // Rendu conditionnel selon l'écran actuel
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'main-menu':
+        return (
+          <MainMenu
+            onSelectMode={handleSelectMode}
+            onResumeGame={handleResumeGame}
+            hasSavedGame={false} // À implémenter plus tard
+          />
+        )
+
+      case 'level-selector':
+        return (
+          <LevelSelector
+            mode={selectedMode}
+            onLevelSelect={handleSelectLevel}
+            onBack={handleBackToMenu}
+          />
+        )
+
+      case 'game':
+      case 'game-over':
+        return (
+          <div className={APP_STYLES.container}>
+            <div className={APP_STYLES.wrapper}>
+              {/* Header */}
+              <header className={APP_STYLES.header}>
+                <div className="flex justify-between items-center w-full mb-4">
+                  <div className="flex items-center space-x-4">
+                    <h1 className={APP_STYLES.title}>PAC-MAN</h1>
+                    <div className="text-sm text-gray-400 font-arcade">
+                      {selectedMode.toUpperCase()} - NIVEAU {selectedLevel}
+                    </div>
+                  </div>
+
+                  {/* Timer pour le mode speedrun */}
+                  {selectedMode === 'speedrun' && (
+                    <div className="flex-shrink-0">
+                      <GameTimer
+                        startTime={state.gameStartTime}
+                        isRunning={state.gameStatus === 'playing' && state.started}
+                        showMilliseconds={true}
+                        color="yellow"
+                      />
+                    </div>
+                  )}
+                </div>
+                <GameStats {...gameStats} />
+              </header>
+
+              {/* Game Board */}
+              <main className={APP_STYLES.main}>
+                <Board {...boardProps} />
+
+                {/* Game completion overlay */}
+                {isLevelComplete && (
+                  <LevelCompleteModal
+                    mode={selectedMode}
+                    level={selectedLevel}
+                    state={state}
+                    timeElapsed={state.gameStartTime > 0 ? Date.now() - state.gameStartTime : 0}
+                    onNextLevel={() => {
+                      const nextLevel = selectedLevel + 1
+                      if (nextLevel <= 50) {
+                        setSelectedLevel(nextLevel)
+                        restart()
+                      }
+                    }}
+                    onRetry={restart}
+                    onBackToMenu={handleBackToMenu}
+                  />
+                )}
+              </main>
+
+              {/* Controls */}
+              <footer className={APP_STYLES.footer}>
+                <div className={APP_STYLES.controls}>
+                  <ThemeToggle />
+                  <ArcadeButton variant="danger" size="sm" onClick={handleBackToLevelSelector} glow>
+                    ← QUITTER
+                  </ArcadeButton>
+                  <ArcadeButton variant="secondary" size="sm" onClick={restart} glow>
+                    🔄 RESTART
+                  </ArcadeButton>
+                </div>
+                <GameInstructions />
+              </footer>
+            </div>
+
+            {/* Game Over Screen */}
+            {state.gameStatus === 'game-over' && (
+              <GameOverScreen
+                score={state.score}
+                onRestart={restart}
+                level={state.level}
+                timeElapsed={
+                  state.gameStartTime > 0
+                    ? Math.floor((Date.now() - state.gameStartTime) / 1000)
+                    : undefined
+                }
+              />
+            )}
           </div>
-          <GameInstructions />
-        </footer>
-      </div>
+        )
 
-      {/* Game Over Screen - déplacé ici pour un centrage correct */}
-      {state.gameStatus === 'game-over' && (
-        <GameOverScreen
-          score={state.score}
-          onRestart={restart}
-          level={state.level}
-          timeElapsed={
-            state.gameStartTime > 0
-              ? Math.floor((Date.now() - state.gameStartTime) / 1000)
-              : undefined
-          }
-        />
-      )}
-    </div>
-  )
+      default:
+        return (
+          <MainMenu
+            onSelectMode={handleSelectMode}
+            onResumeGame={handleResumeGame}
+            hasSavedGame={false}
+          />
+        )
+    }
+  }
+
+  return renderScreen()
 }
 
 export default React.memo(App)

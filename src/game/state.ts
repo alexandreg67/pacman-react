@@ -9,7 +9,9 @@ import { INITIAL_GHOST_POSITIONS } from './logic/ghostHouse'
 import { expireFruits } from './logic/fruits'
 import { shouldAdvanceLevel, advanceLevel } from './logic/levelManager'
 
-export function initialState(): GameState {
+export function initialState(
+  mode: 'classic' | 'easy' | 'hard' | 'speedrun' | 'survival' = 'classic',
+): GameState {
   // Load the classic-like map by default
   const { grid, spawn } = parseMap(CLASSIC_MAP)
   const pellets = grid
@@ -20,13 +22,17 @@ export function initialState(): GameState {
   // Analyse automatiquement la grille pour identifier les lignes où le wrap est possible
   // Remplace les anciennes constantes hardcodées par un algorithme adaptatif
   const tunnelRows = computeTunnelRows(grid)
+
+  // Nombre de vies selon le mode
+  const lives = mode === 'survival' ? 1 : 3
+
   return {
     grid,
     pacman: { ...spawn.pacman },
     dir: 'left',
     queuedDir: undefined,
     score: 0,
-    lives: 3,
+    lives,
     pelletsRemaining: pellets,
     frightenedTicks: 0,
     tickCount: 0,
