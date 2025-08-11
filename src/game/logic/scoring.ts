@@ -1,7 +1,7 @@
 import { Cell, SCORES, TIMERS } from '../types'
 import { getFrightenedDurationTicks } from './ghostSpeed'
 import type { GameState } from '../types'
-import { registerFruitSpawn, shouldSpawnFruit } from './fruits'
+import { registerFruitSpawn, shouldSpawnFruit, maybeCollectFruit } from './fruits'
 
 function updateGridAt(grid: Array<Array<Cell>>, x: number, y: number, newValue: Cell) {
   return grid.map((row, yy) => row.map((c, xx) => (xx === x && yy === y ? newValue : c)))
@@ -22,7 +22,7 @@ export function consumeIfAny(state: GameState): GameState {
     if (shouldSpawnFruit(next)) {
       next = registerFruitSpawn(next)
     }
-    return next
+    return maybeCollectFruit(next)
   }
   if (cell === Cell.PowerPellet) {
     const newGrid = updateGridAt(state.grid, x, y, Cell.Empty)
@@ -37,7 +37,8 @@ export function consumeIfAny(state: GameState): GameState {
     if (shouldSpawnFruit(next)) {
       next = registerFruitSpawn(next)
     }
-    return next
+    return maybeCollectFruit(next)
   }
-  return state
+  // Try to collect fruit even on empty tiles
+  return maybeCollectFruit(state)
 }

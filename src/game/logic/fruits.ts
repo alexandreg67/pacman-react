@@ -36,3 +36,27 @@ export function registerFruitSpawn(state: GameState): GameState {
     fruits: [...fruits, { spawnedAtPellets: state.pelletsRemaining, collected: false }],
   }
 }
+
+export function getFruitPosition(state: GameState): { x: number; y: number } {
+  // Place fruit near the ghost house center, one row below
+  const w = state.grid[0]?.length ?? 0
+  const centerX = Math.floor(w / 2)
+  // Heuristic: put fruit around the house center row + 1 (see CLASSIC_MAP)
+  const y = Math.min(state.grid.length - 1, 15)
+  return { x: centerX, y }
+}
+
+export function maybeCollectFruit(state: GameState): GameState {
+  const s = state as FruitCapableState
+  if (!s.fruits || s.fruits.length === 0) return state
+  const pos = getFruitPosition(state)
+  const onFruit = state.pacman.x === pos.x && state.pacman.y === pos.y
+  if (!onFruit) return state
+  const idx = s.fruits.findIndex((f) => !f.collected)
+  if (idx === -1) return state
+  // Score will be wired from LevelConfig later; placeholder value
+  const fruitScore = 100
+  const updated = [...s.fruits]
+  updated[idx] = { ...updated[idx]!, collected: true }
+  return { ...state, fruits: updated, score: state.score + fruitScore }
+}

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { Cell } from '../game/types'
 import type { GameState, Direction } from '../game/types'
 import { Pacman } from './Pacman'
+import { getFruitPosition } from '../game/logic/fruits'
 import { Ghost } from './Ghost'
 
 type Props = {
@@ -267,6 +268,33 @@ export const Board = React.memo(({ state, tileSize = 28 }: Props) => {
           justWrapped={pacmanPosition.justWrapped}
           isProtected={pacmanPosition.isProtected}
         />
+
+        {/* Fruit (if spawned and not collected) */}
+        {state.fruits?.some((f) => !f.collected) && (
+          <div
+            className="absolute"
+            style={{
+              transform: `translate(${getFruitPosition(state).x * tileSize}px, ${
+                getFruitPosition(state).y * tileSize
+              }px)`,
+              width: tileSize,
+              height: tileSize,
+              zIndex: 80,
+            }}
+            aria-label="fruit"
+          >
+            <div
+              style={{
+                width: tileSize * 0.7,
+                height: tileSize * 0.7,
+                backgroundColor: '#ff2d55',
+                borderRadius: '50% 50% 40% 40%',
+                margin: tileSize * 0.15,
+                boxShadow: '0 0 6px rgba(255,45,85,0.9)',
+              }}
+            />
+          </div>
+        )}
 
         {/* Ghosts (Phase 4 rendering) */}
         {state.ghosts?.map((g) => (
