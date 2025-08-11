@@ -6,13 +6,13 @@ export type FruitInstance = { spawnedAtPellets: number; collected: boolean }
 export type FruitConfig = {
   name: string
   score: number
-  spawnThresholds: number[] // pellets remaining values at which fruit appears (twice per level)
+  spawnThresholdsEaten: number[] // dotsEaten values at which fruit appears (twice per level)
 }
 
 export function getFruitConfigForLevel(level: number): FruitConfig | undefined {
   // Placeholder: will be populated from levels.ts once data is available
   void level
-  return undefined
+  return { name: 'cherry', score: 100, spawnThresholdsEaten: [70, 170] }
 }
 
 type FruitCapableState = GameState & { fruits?: FruitInstance[] }
@@ -23,7 +23,10 @@ export function shouldSpawnFruit(state: GameState): boolean {
   // When pelletsRemaining matches a configured threshold and not already spawned at that threshold
   const already = (state as FruitCapableState).fruits
   const spawnedAt = new Set(already?.map((f) => f.spawnedAtPellets) ?? [])
-  return cfg.spawnThresholds.some((thr) => thr === state.pelletsRemaining && !spawnedAt.has(thr))
+  // Convert dotsEaten threshold to pelletsRemaining marker for tracking purposes
+  return cfg.spawnThresholdsEaten.some(
+    (thr) => thr === state.dotsEaten && !spawnedAt.has(state.pelletsRemaining),
+  )
 }
 
 export function registerFruitSpawn(state: GameState): GameState {
