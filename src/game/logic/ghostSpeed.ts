@@ -5,7 +5,6 @@ import {
   getSpeedsFromLevels,
   getFrightenedDurationTicksFromLevels,
 } from './levels'
-import { getFrightenedDurationTicksFromLevels } from './levels'
 
 type LevelConfig = {
   pacmanMs: number
