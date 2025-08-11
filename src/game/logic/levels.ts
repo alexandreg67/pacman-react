@@ -20,7 +20,70 @@ export interface LevelConfig {
   elroy: { phase1: number; phase2: number }
 }
 
-export const LEVELS: LevelConfig[] = []
+// Populate with defaults matching current engine fallbacks to ensure identical behavior.
+// Tick duration is ~80ms, so we express durations in ms such that ms/TICK_MS equals the fallback tick counts.
+const S = (seconds: number) => Math.round(seconds * 12 /* ticks/sec */ * 80 /* ms/tick */)
+
+export const LEVELS: LevelConfig[] = [
+  // Levels 1-4: schedule S7,C20,S7,C20,S5,C∞; frightened 40 ticks
+  ...[1, 2, 3, 4].map(
+    (id) =>
+      ({
+        id,
+        fruit: id === 1 ? 'cherry' : id === 2 ? 'strawberry' : id <= 4 ? 'orange' : 'fruit',
+        scores: { fruit: 0, ghostEatBase: 200 },
+        frightenedMs: S(40 / 12),
+        scatterChase: [
+          { mode: 'scatter', ms: S(7) },
+          { mode: 'chase', ms: S(20) },
+          { mode: 'scatter', ms: S(7) },
+          { mode: 'chase', ms: S(20) },
+          { mode: 'scatter', ms: S(5) },
+          { mode: 'chase', ms: 'infinite' },
+        ],
+        speeds: {
+          pacmanMs: 80,
+          pacmanTunnelMs: 90,
+          ghostStrideBase: 2,
+          tunnelStrideDelta: 1,
+          frightenedStrideDelta: 1,
+          eatenStrideDelta: -1,
+          elroyStrideBonus: -1,
+        },
+        dotRelease: { pinky: 0, inky: 30, clyde: 15 },
+        elroy: { phase1: 60, phase2: 20 },
+      }) as LevelConfig,
+  ),
+  // Levels 5+: schedule S5,C20,S5,C20,S5,C∞; frightened 30 ticks
+  ...[5, 6, 7, 8, 9, 10].map(
+    (id) =>
+      ({
+        id,
+        fruit: id <= 6 ? 'apple' : id <= 8 ? 'melon' : id <= 10 ? 'galaxian' : 'fruit',
+        scores: { fruit: 0, ghostEatBase: 200 },
+        frightenedMs: S(30 / 12),
+        scatterChase: [
+          { mode: 'scatter', ms: S(5) },
+          { mode: 'chase', ms: S(20) },
+          { mode: 'scatter', ms: S(5) },
+          { mode: 'chase', ms: S(20) },
+          { mode: 'scatter', ms: S(5) },
+          { mode: 'chase', ms: 'infinite' },
+        ],
+        speeds: {
+          pacmanMs: 60,
+          pacmanTunnelMs: 75,
+          ghostStrideBase: 2,
+          tunnelStrideDelta: 1,
+          frightenedStrideDelta: 1,
+          eatenStrideDelta: -1,
+          elroyStrideBonus: -1,
+        },
+        dotRelease: { pinky: 0, inky: 20, clyde: 10 },
+        elroy: { phase1: 70, phase2: 30 },
+      }) as LevelConfig,
+  ),
+]
 
 export function getLevelConfig(level: number): LevelConfig | undefined {
   return LEVELS.find((l) => l.id === level)
