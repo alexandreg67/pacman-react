@@ -1,124 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { ThemeToggle } from './components/ThemeToggle'
 import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
-import hudStyles from './components/Hud.module.css'
 import type { GameMode } from './game/types'
 import MainMenu from './components/MainMenu'
 import LevelSelector from './components/LevelSelector'
-import GameTimer from './components/GameTimer'
-import ArcadeButton from './components/ui/ArcadeButton'
 import LevelCompleteModal from './components/LevelCompleteModal'
 import { loadProgress, saveProgress, updateHighScore } from './game/storage/progress'
 import { calculateStarsFromGameState } from './game/logic/stars'
 import { loadStats, updateStats, saveStats } from './game/storage/stats'
+import LeftSidebar from './components/layout/LeftSidebar'
+import RightSidebar from './components/layout/RightSidebar'
 
 // États de l'application
 type AppScreen = 'main-menu' | 'level-selector' | 'game' | 'game-over'
-
-// Mémorisation des styles statiques
-const APP_STYLES = {
-  container: 'min-h-screen bg-black flex flex-col items-center justify-center p-4',
-  wrapper: 'relative z-10 flex flex-col items-center gap-6 max-w-5xl w-full',
-  header: 'w-full flex flex-col items-center gap-3',
-  title:
-    'text-4xl md:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_2px_8px_rgba(234,179,8,0.25)] font-mono tracking-wider',
-  main: 'relative',
-  overlay: 'absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg',
-  overlayContent: 'text-center text-white',
-  overlayTitle: 'text-4xl font-bold text-yellow-400 mb-4',
-  overlayScore: 'text-xl mb-4',
-  playAgainBtn:
-    'px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg transition-colors duration-200',
-  footer: 'flex flex-col items-center gap-4',
-  controls: 'flex items-center gap-4',
-  resetBtn:
-    'px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-mono font-bold transition-colors duration-200',
-  instructions: 'text-center text-gray-300 font-mono text-sm',
-  kbd: 'px-2 py-1 bg-gray-800 rounded text-white border border-gray-600',
-  kbdSmall: 'px-1 bg-gray-800 rounded text-white border border-gray-600',
-  instructionLine: 'mt-1 text-xs text-gray-500',
-} as const
-
-// Composant de statistiques mémorisé
-const GameStats = React.memo(
-  ({
-    score,
-    lives,
-    pelletsRemaining,
-    level,
-  }: {
-    score: number
-    lives: number
-    pelletsRemaining: number
-    level: number
-  }) => (
-    <div className={hudStyles.hudContainer}>
-      <div className={hudStyles.statItem} aria-label="score">
-        <span className={hudStyles.statLabel}>Score</span>
-        <span className={`${hudStyles.statValue} ${hudStyles.scoreValue}`}>
-          {score.toLocaleString()}
-        </span>
-      </div>
-      <div className={hudStyles.statItem} aria-label="level">
-        <span className={hudStyles.statLabel}>Level</span>
-        <span className={`${hudStyles.statValue} ${hudStyles.levelValue}`}>{level}</span>
-      </div>
-      <div className={hudStyles.statItem} aria-label="lives">
-        <span className={hudStyles.statLabel}>Lives</span>
-        <span className={`${hudStyles.statValue} ${hudStyles.livesContainer}`}>
-          {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
-            <span key={i} role="img" aria-label={`life-${i + 1}`}>
-              ❤️
-            </span>
-          ))}
-          {lives === 0 && <span className={hudStyles.gameOver}>GAME OVER</span>}
-        </span>
-      </div>
-      <div className={hudStyles.statItem} aria-label="pellets">
-        <span className={hudStyles.statLabel}>Pellets</span>
-        <span className={`${hudStyles.statValue} ${hudStyles.pelletsValue}`}>
-          {pelletsRemaining}
-        </span>
-      </div>
-    </div>
-  ),
-)
-
-GameStats.displayName = 'GameStats'
-
-// Composant de completion de niveau mémorisé
-const LevelCompleteOverlay = React.memo(
-  ({ score, onReset }: { score: number; onReset: () => void }) => (
-    <div className={APP_STYLES.overlay}>
-      <div className={APP_STYLES.overlayContent}>
-        <h2 className={APP_STYLES.overlayTitle}>LEVEL COMPLETE!</h2>
-        <p className={APP_STYLES.overlayScore}>Final Score: {score.toLocaleString()}</p>
-        <button onClick={onReset} className={APP_STYLES.playAgainBtn}>
-          Play Again
-        </button>
-      </div>
-    </div>
-  ),
-)
-
-LevelCompleteOverlay.displayName = 'LevelCompleteOverlay'
-
-// Composant d'instructions mémorisé
-const GameInstructions = React.memo(() => (
-  <div className={APP_STYLES.instructions}>
-    <p>
-      Use <kbd className={APP_STYLES.kbd}>←↑→↓</kbd> arrow keys to move
-    </p>
-    <p className={APP_STYLES.instructionLine}>
-      Press <kbd className={APP_STYLES.kbdSmall}>R</kbd> to restart
-    </p>
-  </div>
-))
-
-GameInstructions.displayName = 'GameInstructions'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('main-menu')
@@ -251,6 +147,7 @@ function App() {
     state.score,
     selectedMode,
     selectedLevel,
+    state,
   ])
 
   // Sauvegarder les statistiques en cas de game over
@@ -334,35 +231,19 @@ function App() {
       case 'game':
       case 'game-over':
         return (
-          <div className={APP_STYLES.container}>
-            <div className={APP_STYLES.wrapper}>
-              {/* Header */}
-              <header className={APP_STYLES.header}>
-                <div className="flex justify-between items-center w-full mb-4">
-                  <div className="flex items-center space-x-4">
-                    <h1 className={APP_STYLES.title}>PAC-MAN</h1>
-                    <div className="text-sm text-gray-400 font-arcade">
-                      {selectedMode.toUpperCase()} - NIVEAU {selectedLevel}
-                    </div>
-                  </div>
+          <div className="min-h-screen bg-black relative">
+            {/* Layout Desktop avec sidebars - Affichage à partir de 1200px */}
+            <div className="hidden min-[1200px]:grid min-[1200px]:grid-cols-[280px_1fr_280px] min-[1400px]:grid-cols-[320px_1fr_320px] gap-6 min-[1400px]:gap-8 p-4 min-[1400px]:p-6 h-screen max-w-[1800px] mx-auto">
+              {/* Sidebar Gauche */}
+              <LeftSidebar
+                selectedMode={selectedMode}
+                selectedLevel={selectedLevel}
+                onBackToLevelSelector={handleBackToLevelSelector}
+                onRestart={restart}
+              />
 
-                  {/* Timer pour le mode speedrun */}
-                  {selectedMode === 'speedrun' && (
-                    <div className="flex-shrink-0">
-                      <GameTimer
-                        startTime={state.gameStartTime}
-                        isRunning={state.gameStatus === 'playing' && state.started}
-                        showMilliseconds={true}
-                        color="yellow"
-                      />
-                    </div>
-                  )}
-                </div>
-                <GameStats {...gameStats} />
-              </header>
-
-              {/* Game Board */}
-              <main className={APP_STYLES.main}>
+              {/* Zone de jeu centrale */}
+              <div className="flex flex-col items-center justify-center gap-6">
                 <Board {...boardProps} />
 
                 {/* Game completion overlay */}
@@ -383,36 +264,109 @@ function App() {
                     onBackToMenu={handleBackToMenu}
                   />
                 )}
-              </main>
+              </div>
 
-              {/* Controls */}
-              <footer className={APP_STYLES.footer}>
-                <div className={APP_STYLES.controls}>
-                  <ThemeToggle />
-                  <ArcadeButton variant="danger" size="sm" onClick={handleBackToLevelSelector} glow>
-                    ← QUITTER
-                  </ArcadeButton>
-                  <ArcadeButton variant="secondary" size="sm" onClick={restart} glow>
-                    🔄 RESTART
-                  </ArcadeButton>
-                </div>
-                <GameInstructions />
-              </footer>
+              {/* Sidebar Droite */}
+              <RightSidebar
+                score={gameStats.score}
+                level={gameStats.level}
+                lives={gameStats.lives}
+                pelletsRemaining={gameStats.pelletsRemaining}
+                selectedMode={selectedMode}
+                gameStartTime={state.gameStartTime}
+                isGameRunning={state.gameStatus === 'playing' && state.started}
+                showPerformanceMonitor={process.env.NODE_ENV === 'development'}
+              />
             </div>
 
-            {/* Game Over Screen */}
-            {state.gameStatus === 'game-over' && (
-              <GameOverScreen
-                score={state.score}
-                onRestart={restart}
-                level={state.level}
-                timeElapsed={
-                  state.gameStartTime > 0
-                    ? Math.floor((Date.now() - state.gameStartTime) / 1000)
-                    : undefined
-                }
-              />
-            )}
+            {/* Layout Mobile/Tablet (ancien layout) - En dessous de 1200px */}
+            <div className="min-[1200px]:hidden flex flex-col items-center justify-center p-4 min-h-screen gap-6">
+              {/* Header */}
+              <div className="w-full text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_2px_8px_rgba(234,179,8,0.25)] font-mono tracking-wider">
+                  PAC-MAN
+                </h1>
+
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-400 font-mono">
+                  <div className="bg-gray-800/50 rounded-lg px-3 py-2 border border-gray-700">
+                    <div className="text-yellow-400 font-bold">{selectedMode.toUpperCase()}</div>
+                    <div className="text-gray-300">NIVEAU {selectedLevel}</div>
+                  </div>
+
+                  {/* Timer pour speedrun sur mobile */}
+                  {selectedMode === 'speedrun' && (
+                    <div className="bg-gray-800/50 rounded-lg px-3 py-2 border border-gray-700">
+                      <div className="text-gray-400 text-xs mb-1">TEMPS</div>
+                      {/* Ici on peut ajouter le timer compact */}
+                    </div>
+                  )}
+                </div>
+
+                {/* Stats compactes */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  <div className="bg-gray-800/50 rounded-lg px-3 py-2 text-yellow-400 font-mono text-sm border border-gray-700">
+                    🏆 {gameStats.score.toLocaleString()}
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg px-3 py-2 text-emerald-400 font-mono text-sm border border-gray-700">
+                    🎯 {gameStats.level}
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg px-3 py-2 text-red-400 font-mono text-sm border border-gray-700">
+                    ❤️ {gameStats.lives}
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg px-3 py-2 text-blue-400 font-mono text-sm border border-gray-700">
+                    ⚪ {gameStats.pelletsRemaining}
+                  </div>
+                </div>
+              </div>
+
+              {/* Game Board */}
+              <div className="relative">
+                <Board {...boardProps} />
+
+                {/* Game completion overlay */}
+                {isLevelComplete && (
+                  <LevelCompleteModal
+                    mode={selectedMode}
+                    level={selectedLevel}
+                    state={state}
+                    timeElapsed={state.gameStartTime > 0 ? Date.now() - state.gameStartTime : 0}
+                    onNextLevel={() => {
+                      const nextLevel = selectedLevel + 1
+                      if (nextLevel <= 50) {
+                        setSelectedLevel(nextLevel)
+                        restart()
+                      }
+                    }}
+                    onRetry={restart}
+                    onBackToMenu={handleBackToMenu}
+                  />
+                )}
+              </div>
+
+              {/* Controls */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={handleBackToLevelSelector}
+                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-mono font-bold transition-colors duration-200"
+                  >
+                    ← QUITTER
+                  </button>
+                  <button
+                    onClick={restart}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-mono font-bold transition-colors duration-200"
+                  >
+                    🔄 RESTART
+                  </button>
+                </div>
+
+                {/* Instructions */}
+                <div className="text-center text-gray-300 font-mono text-sm">
+                  <p>Utilisez les flèches ←↑→↓ pour vous déplacer</p>
+                  <p className="text-xs text-gray-500 mt-1">Appuyez sur R pour recommencer</p>
+                </div>
+              </div>
+            </div>
           </div>
         )
 
@@ -427,7 +381,24 @@ function App() {
     }
   }
 
-  return renderScreen()
+  return (
+    <>
+      {renderScreen()}
+      {/* Game Over Screen rendu via portail - toujours disponible quand nécessaire */}
+      {state.gameStatus === 'game-over' && (
+        <GameOverScreen
+          score={state.score}
+          onRestart={restart}
+          level={state.level}
+          timeElapsed={
+            state.gameStartTime > 0
+              ? Math.floor((Date.now() - state.gameStartTime) / 1000)
+              : undefined
+          }
+        />
+      )}
+    </>
+  )
 }
 
 export default React.memo(App)
