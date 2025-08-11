@@ -56,7 +56,7 @@ const InteractiveParticles: React.FC<InteractiveParticlesProps> = ({
         vy: (Math.random() - 0.5) * 2,
         life: 60,
         maxLife: 60,
-        color: colors[Math.floor(Math.random() * colors.length)]!,
+        color: colors.length > 0 ? colors[Math.floor(Math.random() * colors.length)] : '#ffffff',
         size: Math.random() * 3 + 1,
       }
       particlesRef.current.push(particle)

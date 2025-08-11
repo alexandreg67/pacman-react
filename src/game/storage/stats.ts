@@ -22,8 +22,8 @@ export interface GameStats {
   highestScore: number
 }
 
-// Clé pour le localStorage
-const STATS_KEY = 'pacman_stats'
+// Clé configurable pour le localStorage
+export const STATS_STORAGE_KEY = 'pacman_stats'
 
 // Valeurs par défaut
 const DEFAULT_STATS: GameStats = {
@@ -78,12 +78,12 @@ const DEFAULT_STATS: GameStats = {
 // Charger les statistiques depuis le localStorage
 export function loadStats(): GameStats {
   try {
-    const data = localStorage.getItem(STATS_KEY)
+    const data = localStorage.getItem(STATS_STORAGE_KEY)
     if (data) {
       return { ...DEFAULT_STATS, ...JSON.parse(data) }
     }
   } catch (error) {
-    console.warn('Erreur lors du chargement des statistiques:', error)
+    console.warn('Error loading statistics:', error)
   }
   return DEFAULT_STATS
 }
@@ -91,9 +91,9 @@ export function loadStats(): GameStats {
 // Sauvegarder les statistiques dans le localStorage
 export function saveStats(stats: GameStats): void {
   try {
-    localStorage.setItem(STATS_KEY, JSON.stringify(stats))
+    localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(stats))
   } catch (error) {
-    console.warn('Erreur lors de la sauvegarde des statistiques:', error)
+    console.warn('Error saving statistics:', error)
   }
 }
 

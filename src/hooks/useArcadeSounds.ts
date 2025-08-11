@@ -43,7 +43,7 @@ export function useArcadeSounds() {
           (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
         audioContextRef.current = new AudioContextClass()
       } catch {
-        console.warn('Web Audio API non supporté')
+        console.warn('Web Audio API not supported')
         return null
       }
     }
@@ -84,7 +84,7 @@ export function useArcadeSounds() {
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + config.duration / 1000)
       } catch {
-        console.warn('Erreur lors de la lecture du son')
+        console.warn('Error while playing sound')
       }
     },
     [getAudioContext],
@@ -119,7 +119,7 @@ export function useArcadeSounds() {
 
           currentTime += note.duration / 1000 + 0.05 // Petit gap entre les notes
         } catch {
-          console.warn('Erreur lors de la lecture de la mélodie')
+          console.warn('Error while playing melody')
         }
       })
     },

@@ -21,8 +21,8 @@ export interface ProgressData {
   lastPlayedLevel: number | null
 }
 
-// Clé pour le localStorage
-const STORAGE_KEY = 'pacman_progress'
+// Clé configurable pour le localStorage
+export const PROGRESS_STORAGE_KEY = 'pacman_progress'
 
 // Valeurs par défaut
 const DEFAULT_PROGRESS: ProgressData = {
@@ -55,12 +55,12 @@ const DEFAULT_PROGRESS: ProgressData = {
 // Charger la progression depuis le localStorage
 export function loadProgress(): ProgressData {
   try {
-    const data = localStorage.getItem(STORAGE_KEY)
+    const data = localStorage.getItem(PROGRESS_STORAGE_KEY)
     if (data) {
       return { ...DEFAULT_PROGRESS, ...JSON.parse(data) }
     }
   } catch (error) {
-    console.warn('Erreur lors du chargement de la progression:', error)
+    console.warn('Error loading progress:', error)
   }
   return DEFAULT_PROGRESS
 }
@@ -68,9 +68,9 @@ export function loadProgress(): ProgressData {
 // Sauvegarder la progression dans le localStorage
 export function saveProgress(progress: ProgressData): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress))
   } catch (error) {
-    console.warn('Erreur lors de la sauvegarde de la progression:', error)
+    console.warn('Error saving progress:', error)
   }
 }
 
