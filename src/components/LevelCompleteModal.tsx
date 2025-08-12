@@ -32,7 +32,15 @@ const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
   const [showContent, setShowContent] = useState(false)
   const { playVictoryMelody, playSuccessMelody } = useArcadeSounds()
 
-  const stars = calculateStarsFromGameState(mode, level, state, timeElapsed)
+  const stars = calculateStarsFromGameState(
+    mode,
+    level,
+    state.grid,
+    state.pelletsRemaining,
+    state.lives,
+    state.score,
+    timeElapsed,
+  )
   const starDescriptions = getStarDescription(mode, level)
 
   const timeInSeconds = Math.floor(timeElapsed / 1000)

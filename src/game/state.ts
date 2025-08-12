@@ -2,7 +2,7 @@ import { CLASSIC_MAP, parseMap, computeTunnelRows } from './grid'
 import type { Direction, GameState } from './types'
 import { Cell } from './types'
 import { attemptMove } from './entities/pacman'
-import { consumeIfAny } from './logic/scoring'
+import { consumeIfAnyWithAudio } from './logic/scoring'
 import { stepGhosts } from './entities/ghosts'
 import { advanceGlobalModeTimer, getModeSchedule } from './logic/ghostModes'
 import { INITIAL_GHOST_POSITIONS } from './logic/ghostHouse'
@@ -62,6 +62,7 @@ export function initialState(
     frightChain: 0,
     dotsEaten: 0,
     elroy: { phase: 0 },
+    audioEvent: null,
   }
 }
 
@@ -77,7 +78,7 @@ export function handlePacmanDeath(state: GameState): GameState {
     }
   }
 
-  // Respawn: reset Pacman to initial position and reinitialize ghosts
+  // Respawn: reset Pac-Man to initial position and reinitialize ghosts
   const { spawn } = parseMap(CLASSIC_MAP)
   return {
     ...state,
@@ -175,9 +176,12 @@ export function step(state: GameState, inputDir?: Direction): GameState {
 
   // Try to move: prefer queuedDir, else current dir only if game has started
   const desired: Direction | undefined = next.queuedDir ?? (next.started ? next.dir : undefined)
+  let movementAttempted = false
+
   if (desired) {
     const moved = attemptMove(next, desired)
     next = moved
+    movementAttempted = true
 
     // If we successfully moved in queuedDir, clear the queue
     if (next.dir === next.queuedDir) {
@@ -185,7 +189,19 @@ export function step(state: GameState, inputDir?: Direction): GameState {
     }
   }
 
-  next = consumeIfAny(next)
+  // Consumption occurs whenever a movement is attempted,
+  // regardless of whether the move is successful or blocked.
+  // This matches the intended behavior: Pac-Man "chomps" on any movement attempt.
+  if (movementAttempted) {
+    const consumption = consumeIfAnyWithAudio(next)
+    next = {
+      ...consumption.newState,
+      audioEvent: consumption.consumed,
+    }
+  } else {
+    // Clear audio event when no consumption
+    next = { ...next, audioEvent: null }
+  }
   // Reset fright chain when not frightened
   if (next.frightenedTicks === 0 && next.frightChain !== 0) {
     next = { ...next, frightChain: 0 }

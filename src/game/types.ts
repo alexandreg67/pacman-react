@@ -77,6 +77,8 @@ export type GameState = {
   elroy: { phase: 0 | 1 | 2 }
   // Fruits (optional until fully implemented)
   fruits?: { spawnedAtPellets: number; spawnedAtTick: number; collected: boolean }[]
+  // Audio events (for triggering sounds)
+  audioEvent?: 'pellet' | 'power-pellet' | 'fruit' | null
 }
 
 export const SCORES = {

@@ -5,7 +5,8 @@
       "WebFetch(domain:pacmancode.com)",
       "WebFetch(domain:pacman.fandom.com)",
       "WebFetch(domain:www.gamedeveloper.com)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }
