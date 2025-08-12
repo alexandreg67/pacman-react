@@ -100,6 +100,7 @@ function App() {
   const isLevelComplete = state.pelletsRemaining === 0
 
   // Sauvegarder la progression quand le niveau est terminé
+
   useEffect(() => {
     if (isLevelComplete && state.started && state.gameStartTime > 0) {
       const timeElapsed = Date.now() - state.gameStartTime
@@ -147,8 +148,11 @@ function App() {
     state.score,
     state.pelletsRemaining,
     state.lives,
+    state.grid,
     selectedMode,
     selectedLevel,
+    // NOTE: We intentionally avoid `state` object to prevent unnecessary re-renders
+    // Only specific state properties above are tracked
   ])
 
   // Sauvegarder les statistiques en cas de game over
