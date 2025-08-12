@@ -122,13 +122,8 @@ export function useGameAudio() {
   const { play, stop, isPlaying, isInitialized } = useAudio()
 
   const playChomp = useCallback(() => {
-    // Always stop previous chomp to prevent looping/buildup
-    stop('chomp')
-    // Short delay to ensure clean stop, then play
-    setTimeout(() => {
-      play('chomp', { stopPrevious: true, loop: false })
-    }, 10)
-  }, [play, stop])
+    play('chomp', { stopPrevious: true, loop: false })
+  }, [play])
 
   const playDeath = useCallback(() => {
     play('death')

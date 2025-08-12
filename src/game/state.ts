@@ -176,12 +176,12 @@ export function step(state: GameState, inputDir?: Direction): GameState {
 
   // Try to move: prefer queuedDir, else current dir only if game has started
   const desired: Direction | undefined = next.queuedDir ?? (next.started ? next.dir : undefined)
-  let shouldConsume = false
+  let movementAttempted = false
 
   if (desired) {
     const moved = attemptMove(next, desired)
     next = moved
-    shouldConsume = true
+    movementAttempted = true
 
     // If we successfully moved in queuedDir, clear the queue
     if (next.dir === next.queuedDir) {
@@ -189,11 +189,9 @@ export function step(state: GameState, inputDir?: Direction): GameState {
     }
   }
 
-  // In classic Pacman, Pacman can consume pellets when:
-  // 1. He successfully moves to a new position
-  // 2. He tries to move but can't (hitting a wall) - he "chomps" in place
-  // 3. The game has started and he's on a pellet (continuous chomping)
-  if (shouldConsume) {
+  // In classic Pacman, consumption only occurs when movement is attempted
+  // (either successful movement or blocked movement results in chomping)
+  if (movementAttempted) {
     const consumption = consumeIfAnyWithAudio(next)
     next = {
       ...consumption.newState,

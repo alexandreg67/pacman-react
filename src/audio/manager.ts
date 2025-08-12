@@ -96,7 +96,7 @@ export class AudioManager {
     if (!sound) return
 
     // Stop previous instance if requested (useful for rapid fire sounds like chomp)
-    if (options?.stopPrevious !== false) {
+    if (options?.stopPrevious === true) {
       sound.stop()
     }
 
