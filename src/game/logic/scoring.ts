@@ -64,31 +64,27 @@ export function consumeIfAnyWithAudio(state: GameState): {
   const { x, y } = state.pacman
   const cell = state.grid[y][x]
 
+  let nextState: GameState = state
+  let consumed: 'pellet' | 'power-pellet' | null = null
+  let beforeFruitCollection: GameState
+
   if (cell === Cell.Pellet) {
     const newGrid = updateGridAt(state.grid, x, y, Cell.Empty)
-    let next: GameState = {
+    nextState = {
       ...state,
       grid: newGrid,
       score: state.score + SCORES.pellet,
       pelletsRemaining: Math.max(0, state.pelletsRemaining - 1),
       dotsEaten: state.dotsEaten + 1,
     }
-    if (shouldSpawnFruit(next)) {
-      next = registerFruitSpawn(next)
+    if (shouldSpawnFruit(nextState)) {
+      nextState = registerFruitSpawn(nextState)
     }
-    const finalState = maybeCollectFruit(next)
-
-    // Check if a fruit was also collected using robust detection
-    const fruitCollected = checkFruitCollection(next, finalState)
-    return {
-      newState: finalState,
-      consumed: fruitCollected ? 'fruit' : 'pellet',
-    }
-  }
-
-  if (cell === Cell.PowerPellet) {
+    consumed = 'pellet'
+    beforeFruitCollection = nextState
+  } else if (cell === Cell.PowerPellet) {
     const newGrid = updateGridAt(state.grid, x, y, Cell.Empty)
-    let next: GameState = {
+    nextState = {
       ...state,
       grid: newGrid,
       score: state.score + SCORES.powerPellet,
@@ -96,25 +92,22 @@ export function consumeIfAnyWithAudio(state: GameState): {
       dotsEaten: state.dotsEaten + 1,
       frightenedTicks: getFrightenedDurationTicks(state.level) || TIMERS.frightenedDurationTicks,
     }
-    if (shouldSpawnFruit(next)) {
-      next = registerFruitSpawn(next)
+    if (shouldSpawnFruit(nextState)) {
+      nextState = registerFruitSpawn(nextState)
     }
-    const finalState = maybeCollectFruit(next)
-
-    // Check if a fruit was also collected using robust detection
-    const fruitCollected = checkFruitCollection(next, finalState)
-    return {
-      newState: finalState,
-      consumed: fruitCollected ? 'fruit' : 'power-pellet',
-    }
+    consumed = 'power-pellet'
+    beforeFruitCollection = nextState
+  } else {
+    // No pellet consumed, but still try to collect fruit
+    beforeFruitCollection = state
   }
 
-  // Try to collect fruit even on empty tiles
-  const finalState = maybeCollectFruit(state)
-  const fruitCollected = checkFruitCollection(state, finalState)
+  // Single fruit collection check for all cases
+  const finalState = maybeCollectFruit(nextState)
+  const fruitCollected = checkFruitCollection(beforeFruitCollection, finalState)
 
   return {
     newState: finalState,
-    consumed: fruitCollected ? 'fruit' : null,
+    consumed: fruitCollected ? 'fruit' : consumed,
   }
 }

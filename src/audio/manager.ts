@@ -4,6 +4,7 @@ import { SOUNDS_CONFIG, DEFAULT_AUDIO_SETTINGS } from './sounds'
 
 export class AudioManager {
   private static instance: AudioManager | null = null
+  private static destroyed = false
   private sounds: Map<SoundId, Howl> = new Map()
   private settings: AudioSettings = { ...DEFAULT_AUDIO_SETTINGS }
   private initialized = false
@@ -15,6 +16,9 @@ export class AudioManager {
   }
 
   public static getInstance(): AudioManager {
+    if (AudioManager.destroyed) {
+      throw new Error('AudioManager has been destroyed and cannot be re-created.')
+    }
     if (!AudioManager.instance) {
       AudioManager.instance = new AudioManager()
     }
@@ -223,7 +227,9 @@ export class AudioManager {
     })
     this.sounds.clear()
     this.loadingPromises.clear()
+    this.pausedSounds.clear()
     this.initialized = false
+    AudioManager.destroyed = true
     AudioManager.instance = null
   }
 }

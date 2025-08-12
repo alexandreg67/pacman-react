@@ -20,6 +20,7 @@ export function useGameAudioIntegration(
 ) {
   const audio = useGameAudio()
   const prevStateRef = useRef<GameState | null>(null)
+  const intermissionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const prevState = prevStateRef.current
@@ -81,13 +82,19 @@ export function useGameAudioIntegration(
 
     // Level progression
     if (gameState.level > prevState.level) {
+      // Clear any existing timeout first
+      if (intermissionTimeoutRef.current) {
+        clearTimeout(intermissionTimeoutRef.current)
+      }
+
       // Stop all sounds and play intermission
       audio.playIntermissionMusic()
       handlers.onLevelComplete?.()
 
       // Auto-stop intermission after a delay
-      setTimeout(() => {
+      intermissionTimeoutRef.current = setTimeout(() => {
         audio.stopIntermissionMusic()
+        intermissionTimeoutRef.current = null
       }, 3000)
     }
 
@@ -139,6 +146,12 @@ export function useGameAudioIntegration(
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      // Clear any pending timeouts
+      if (intermissionTimeoutRef.current) {
+        clearTimeout(intermissionTimeoutRef.current)
+        intermissionTimeoutRef.current = null
+      }
+
       if (audio.isInitialized) {
         audio.stopIntermissionMusic()
         audio.stopGhostNormalMove()
