@@ -78,7 +78,7 @@ export function handlePacmanDeath(state: GameState): GameState {
     }
   }
 
-  // Respawn: reset Pacman to initial position and reinitialize ghosts
+  // Respawn: reset Pac-Man to initial position and reinitialize ghosts
   const { spawn } = parseMap(CLASSIC_MAP)
   return {
     ...state,
@@ -189,8 +189,9 @@ export function step(state: GameState, inputDir?: Direction): GameState {
     }
   }
 
-  // In classic Pacman, consumption only occurs when movement is attempted
-  // (either successful movement or blocked movement results in chomping)
+  // Consumption occurs whenever a movement is attempted,
+  // regardless of whether the move is successful or blocked.
+  // This matches the intended behavior: Pac-Man "chomps" on any movement attempt.
   if (movementAttempted) {
     const consumption = consumeIfAnyWithAudio(next)
     next = {

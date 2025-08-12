@@ -232,6 +232,15 @@ export class AudioManager {
     AudioManager.destroyed = true
     AudioManager.instance = null
   }
+
+  // Reset method for testing/hot reloading scenarios
+  public static reset(): void {
+    if (AudioManager.instance) {
+      AudioManager.instance.destroy()
+    }
+    AudioManager.destroyed = false
+    AudioManager.instance = null
+  }
 }
 
 export const audioManager = AudioManager.getInstance()

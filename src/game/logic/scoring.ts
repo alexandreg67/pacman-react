@@ -2,6 +2,7 @@ import { Cell, SCORES, TIMERS } from '../types'
 import { getFrightenedDurationTicks } from './ghostSpeed'
 import type { GameState } from '../types'
 import { registerFruitSpawn, shouldSpawnFruit, maybeCollectFruit } from './fruits'
+import { getLevelConfig } from './levels'
 
 function checkFruitCollection(beforeState: GameState, afterState: GameState): boolean {
   // Check if fruit collection occurred by comparing score increase
@@ -11,10 +12,24 @@ function checkFruitCollection(beforeState: GameState, afterState: GameState): bo
   // If no score change, no fruit was collected
   if (scoreDifference <= 0) return false
 
-  // Fruit scores are typically 100, 300, 500, 700, 1000, 2000+
-  // This is more reliable than simple score comparison
-  const fruitScoreRange = [100, 300, 500, 700, 1000, 2000, 5000]
-  return fruitScoreRange.includes(scoreDifference)
+  // Generate fruit score range from level configurations to maintain consistency
+  // This approach is more reliable than hardcoded values and stays in sync with game data
+  const fruitScoreRange = new Set<number>()
+
+  // Collect all possible fruit scores from level configurations
+  for (let level = 1; level <= 50; level++) {
+    const config = getLevelConfig(level)
+    if (config?.scores.fruit) {
+      fruitScoreRange.add(config.scores.fruit)
+    }
+  }
+
+  // Fallback to known range if no configs found
+  if (fruitScoreRange.size === 0) {
+    return [100, 300, 500, 700, 1000, 2000, 5000].includes(scoreDifference)
+  }
+
+  return fruitScoreRange.has(scoreDifference)
 }
 
 function updateGridAt(grid: Array<Array<Cell>>, x: number, y: number, newValue: Cell) {

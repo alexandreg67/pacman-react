@@ -2,7 +2,7 @@ import { Cell } from './types'
 import type { Grid, SpawnInfo } from './types'
 
 // Demo map (small) — characters legend:
-// # = Wall, . = Pellet, o = Power pellet, space = Empty, P = Pacman spawn, = = Ghost door
+// # = Wall, . = Pellet, o = Power pellet, space = Empty, P = Pac-Man spawn, = = Ghost door
 // Classic-like 28x31 maze (simplified ASCII). Legend:
 // # wall, . pellet, o power pellet, P spawn, space = empty, = ghost door
 // Note: This is a stylistic approximation, not a verbatim ROM map.
@@ -70,7 +70,7 @@ export function parseMap(lines: string[]): { grid: Grid; spawn: SpawnInfo } {
     grid.push(row)
   }
   if (!spawn) {
-    throw new Error('No Pacman spawn (P) found in map')
+    throw new Error('No Pac-Man spawn (P) found in map')
   }
   return { grid, spawn }
 }

@@ -125,7 +125,7 @@ export function AudioControls({ compact = false, className = '' }: AudioControls
 
       {/* Audio Status Info */}
       <div className="mt-3 pt-3 border-t border-gray-700">
-        <div className="text-xs font-mono text-gray-500 text-center">Original Pacman sounds</div>
+        <div className="text-xs font-mono text-gray-500 text-center">Original Pac-Man sounds</div>
       </div>
     </div>
   )
