@@ -100,10 +100,19 @@ function App() {
   const isLevelComplete = state.pelletsRemaining === 0
 
   // Sauvegarder la progression quand le niveau est terminé
+
   useEffect(() => {
     if (isLevelComplete && state.started && state.gameStartTime > 0) {
       const timeElapsed = Date.now() - state.gameStartTime
-      const stars = calculateStarsFromGameState(selectedMode, selectedLevel, state, timeElapsed)
+      const stars = calculateStarsFromGameState(
+        selectedMode,
+        selectedLevel,
+        state.grid,
+        state.pelletsRemaining,
+        state.lives,
+        state.score,
+        timeElapsed,
+      )
 
       // Mettre à jour la progression
       let progress = loadProgress()
@@ -144,11 +153,14 @@ function App() {
     isLevelComplete,
     state.started,
     state.gameStartTime,
+    state.pelletsRemaining,
+    state.lives,
     state.score,
+    state.grid, // state.grid est toujours nécessaire pour le calcul des pellets dans calculateStarsFromGameState
     selectedMode,
     selectedLevel,
-
-    // We don't need the entire state object, only specific properties listed above
+    // NOTE: We intentionally avoid `state` object to prevent unnecessary re-renders
+    // Only specific state properties above are tracked
   ])
 
   // Sauvegarder les statistiques en cas de game over
