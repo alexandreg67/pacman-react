@@ -3,6 +3,20 @@ import { getFrightenedDurationTicks } from './ghostSpeed'
 import type { GameState } from '../types'
 import { registerFruitSpawn, shouldSpawnFruit, maybeCollectFruit } from './fruits'
 
+function checkFruitCollection(beforeState: GameState, afterState: GameState): boolean {
+  // Check if fruit collection occurred by comparing score increase
+  // and validating that no other scoring events happened
+  const scoreDifference = afterState.score - beforeState.score
+
+  // If no score change, no fruit was collected
+  if (scoreDifference <= 0) return false
+
+  // Fruit scores are typically 100, 300, 500, 700, 1000, 2000+
+  // This is more reliable than simple score comparison
+  const fruitScoreRange = [100, 300, 500, 700, 1000, 2000, 5000]
+  return fruitScoreRange.includes(scoreDifference)
+}
+
 function updateGridAt(grid: Array<Array<Cell>>, x: number, y: number, newValue: Cell) {
   return grid.map((row, yy) => row.map((c, xx) => (xx === x && yy === y ? newValue : c)))
 }
@@ -64,9 +78,8 @@ export function consumeIfAnyWithAudio(state: GameState): {
     }
     const finalState = maybeCollectFruit(next)
 
-    // Check if a fruit was also collected by comparing the score increase
-    // after maybeCollectFruit (only fruit collection increases score at this point)
-    const fruitCollected = finalState.score > next.score
+    // Check if a fruit was also collected using robust detection
+    const fruitCollected = checkFruitCollection(next, finalState)
     return {
       newState: finalState,
       consumed: fruitCollected ? 'fruit' : 'pellet',
@@ -88,9 +101,8 @@ export function consumeIfAnyWithAudio(state: GameState): {
     }
     const finalState = maybeCollectFruit(next)
 
-    // Check if a fruit was also collected by comparing the score increase
-    // after maybeCollectFruit (only fruit collection increases score at this point)
-    const fruitCollected = finalState.score > next.score
+    // Check if a fruit was also collected using robust detection
+    const fruitCollected = checkFruitCollection(next, finalState)
     return {
       newState: finalState,
       consumed: fruitCollected ? 'fruit' : 'power-pellet',
@@ -99,7 +111,7 @@ export function consumeIfAnyWithAudio(state: GameState): {
 
   // Try to collect fruit even on empty tiles
   const finalState = maybeCollectFruit(state)
-  const fruitCollected = finalState.score > state.score
+  const fruitCollected = checkFruitCollection(state, finalState)
 
   return {
     newState: finalState,

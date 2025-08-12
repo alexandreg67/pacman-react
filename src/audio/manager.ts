@@ -8,6 +8,7 @@ export class AudioManager {
   private settings: AudioSettings = { ...DEFAULT_AUDIO_SETTINGS }
   private initialized = false
   private loadingPromises: Map<SoundId, Promise<void>> = new Map()
+  private pausedSounds: Set<SoundId> = new Set()
 
   private constructor() {
     this.loadSettings()
@@ -133,12 +134,14 @@ export class AudioManager {
     const sound = this.sounds.get(soundId)
     if (sound) {
       sound.pause()
+      this.pausedSounds.add(soundId)
     }
   }
 
   public pauseAll(): void {
-    this.sounds.forEach((sound) => {
+    this.sounds.forEach((sound, soundId) => {
       sound.pause()
+      this.pausedSounds.add(soundId)
     })
   }
 
@@ -146,15 +149,18 @@ export class AudioManager {
     const sound = this.sounds.get(soundId)
     if (sound) {
       sound.play()
+      this.pausedSounds.delete(soundId)
     }
   }
 
   public resumeAll(): void {
-    this.sounds.forEach((sound) => {
-      if (sound.state() === 'loaded' && sound.seek() > 0) {
+    this.pausedSounds.forEach((soundId) => {
+      const sound = this.sounds.get(soundId)
+      if (sound && sound.state() === 'loaded') {
         sound.play()
       }
     })
+    this.pausedSounds.clear()
   }
 
   public isPlaying(soundId: SoundId): boolean {
