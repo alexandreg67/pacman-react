@@ -35,7 +35,7 @@ export const SOUNDS_CONFIG: Record<SoundId, SoundConfig> = {
     id: 'chomp',
     src: '/audio/gameplay/chomp.mp3',
     category: 'gameplay',
-    volume: 0.9, // Plus fort pour dominer l'ambiance
+    volume: 0.9, // Louder to dominate ambient sounds
     loop: false,
     preload: true,
   },
@@ -71,7 +71,7 @@ export const SOUNDS_CONFIG: Record<SoundId, SoundConfig> = {
     id: 'ghost-normal-move',
     src: '/audio/gameplay/ghost-normal-move.mp3',
     category: 'gameplay',
-    volume: 0.2, // Légèrement plus faible pour l'équilibre
+    volume: 0.2, // Slightly lower for balance
     loop: true,
     preload: true,
   },

@@ -64,7 +64,8 @@ export function consumeIfAnyWithAudio(state: GameState): {
     }
     const finalState = maybeCollectFruit(next)
 
-    // Check if a fruit was also collected
+    // Check if a fruit was also collected by comparing the score increase
+    // after maybeCollectFruit (only fruit collection increases score at this point)
     const fruitCollected = finalState.score > next.score
     return {
       newState: finalState,
@@ -87,7 +88,8 @@ export function consumeIfAnyWithAudio(state: GameState): {
     }
     const finalState = maybeCollectFruit(next)
 
-    // Check if a fruit was also collected
+    // Check if a fruit was also collected by comparing the score increase
+    // after maybeCollectFruit (only fruit collection increases score at this point)
     const fruitCollected = finalState.score > next.score
     return {
       newState: finalState,
