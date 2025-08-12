@@ -204,23 +204,26 @@ export function getStarDescription(
 export function calculateStarsFromGameState(
   mode: GameMode,
   level: number,
-  state: GameState,
+  grid: GameState['grid'],
+  pelletsRemaining: GameState['pelletsRemaining'],
+  lives: GameState['lives'],
+  score: GameState['score'],
   timeElapsed: number,
 ): number {
-  const totalPellets = state.grid
+  const totalPellets = grid
     .flat()
     .filter((cell) => cell === 'Pellet' || cell === 'PowerPellet').length
 
-  const pelletsCollected = totalPellets - state.pelletsRemaining
-  const deaths = 3 - state.lives // Estimation des morts (on commence avec 3 vies)
+  const collectedPellets = totalPellets - pelletsRemaining
+  const deaths = 3 - lives // Estimation des morts (on commence avec 3 vies)
 
   return calculateStars(
     mode,
     level,
-    state.score,
+    score,
     Math.floor(timeElapsed / 1000),
     deaths,
-    pelletsCollected,
+    collectedPellets,
     totalPellets,
   )
 }
