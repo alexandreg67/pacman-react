@@ -145,9 +145,10 @@ function App() {
     state.started,
     state.gameStartTime,
     state.score,
+    state.pelletsRemaining,
+    state.lives,
     selectedMode,
     selectedLevel,
-    state,
   ])
 
   // Sauvegarder les statistiques en cas de game over
