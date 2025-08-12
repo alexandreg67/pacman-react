@@ -41,12 +41,12 @@ const RightSidebar: React.FC<RightSidebarProps> = React.memo(
     const gameTime = gameStartTime > 0 ? Date.now() - gameStartTime : 0
 
     return (
-      <div className="flex flex-col gap-4 w-full h-full">
+      <div className="flex flex-col justify-center gap-6 w-full h-full py-4">
         {/* Timer pour le mode speedrun */}
         {selectedMode === 'speedrun' && (
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="bg-gray-900/60 backdrop-blur-sm rounded-lg p-5 border border-gray-600/80 shadow-lg">
             <div className="text-center">
-              <div className="text-gray-400 text-xs font-mono mb-2 uppercase tracking-wider">
+              <div className="text-gray-300 text-sm font-mono mb-3 uppercase tracking-wider font-bold">
                 ⏱️ TEMPS
               </div>
               <GameTimer
@@ -60,27 +60,32 @@ const RightSidebar: React.FC<RightSidebarProps> = React.memo(
         )}
 
         {/* Statistiques principales */}
-        <div className="space-y-3">
-          <div className="text-center text-gray-400 text-xs font-mono mb-3 uppercase tracking-wider">
+        <div className="space-y-4">
+          <div className="text-center text-gray-300 text-sm font-mono mb-4 uppercase tracking-wider font-bold">
             📊 STATISTIQUES
           </div>
 
-          <ScoreDisplay score={score} size="md" />
-          <LevelDisplay level={level} size="sm" />
-          <LivesDisplay lives={lives} size="sm" />
-          <PelletsDisplay pelletsRemaining={pelletsRemaining} size="sm" />
+          <div className="space-y-3">
+            <ScoreDisplay score={score} size="md" />
+            <LevelDisplay level={level} size="sm" />
+            <LivesDisplay lives={lives} size="sm" />
+            <PelletsDisplay pelletsRemaining={pelletsRemaining} size="sm" />
+          </div>
         </div>
 
+        {/* Séparateur visuel */}
+        <div className="border-t border-gray-700/50 mx-4"></div>
+
         {/* Indicateur de progression du niveau */}
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-3 border border-gray-700">
-          <div className="text-center text-gray-400 text-xs font-mono mb-2 uppercase tracking-wider">
+        <div className="bg-gray-900/60 backdrop-blur-sm rounded-lg p-4 border border-gray-600/80 shadow-lg">
+          <div className="text-center text-gray-300 text-sm font-mono mb-3 uppercase tracking-wider font-bold">
             🎯 PROGRESSION
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {/* Barre de progression des pellets */}
-            <div className="w-full bg-gray-800 rounded-full h-2">
+            <div className="w-full bg-gray-800/80 rounded-full h-3 shadow-inner">
               <div
-                className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-blue-400 h-3 rounded-full transition-all duration-300 shadow-sm"
                 style={{
                   width:
                     pelletsRemaining > 0
@@ -89,7 +94,7 @@ const RightSidebar: React.FC<RightSidebarProps> = React.memo(
                 }}
               />
             </div>
-            <div className="text-xs text-gray-500 text-center">
+            <div className="text-sm text-gray-300 text-center font-medium">
               {pelletsRemaining === 0 ? 'NIVEAU TERMINÉ!' : `${240 - pelletsRemaining}/240 pellets`}
             </div>
           </div>
@@ -97,26 +102,37 @@ const RightSidebar: React.FC<RightSidebarProps> = React.memo(
 
         {/* Performance Monitor (développement uniquement) */}
         {showPerformanceMonitor && (
-          <PerformanceMonitor gameTime={gameTime} fps={fps} showInProduction={false} size="sm" />
+          <>
+            <div className="border-t border-gray-700/50 mx-4"></div>
+            <PerformanceMonitor gameTime={gameTime} fps={fps} showInProduction={false} size="sm" />
+          </>
         )}
 
+        {/* Séparateur visuel */}
+        <div className="border-t border-gray-700/50 mx-4"></div>
+
         {/* Informations du niveau */}
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-3 border border-gray-700 mt-auto">
-          <div className="text-center text-gray-400 text-xs font-mono mb-2 uppercase tracking-wider">
+        <div className="bg-gray-900/60 backdrop-blur-sm rounded-lg p-4 border border-gray-600/80 shadow-lg">
+          <div className="text-center text-gray-300 text-sm font-mono mb-3 uppercase tracking-wider font-bold">
             ℹ️ NIVEAU
           </div>
-          <div className="space-y-1 text-xs text-gray-300 text-center">
+          <div className="space-y-2 text-sm text-gray-300 text-center">
             <div>
-              Mode: <span className="text-yellow-400 font-mono">{selectedMode.toUpperCase()}</span>
+              Mode:{' '}
+              <span className="text-yellow-400 font-mono font-bold">
+                {selectedMode.toUpperCase()}
+              </span>
             </div>
             <div>
-              Niveau: <span className="text-emerald-400 font-mono">{level}</span>
+              Niveau: <span className="text-emerald-400 font-mono font-bold">{level}</span>
             </div>
             {lives === 0 && (
-              <div className="text-red-400 font-bold animate-pulse mt-2">⚠️ GAME OVER</div>
+              <div className="text-red-400 font-bold animate-pulse mt-3 text-base">
+                ⚠️ GAME OVER
+              </div>
             )}
             {pelletsRemaining === 0 && lives > 0 && (
-              <div className="text-emerald-400 font-bold animate-pulse mt-2">
+              <div className="text-emerald-400 font-bold animate-pulse mt-3 text-base">
                 ✅ NIVEAU COMPLÉTÉ!
               </div>
             )}
