@@ -3,6 +3,7 @@ import { GameOverScreen } from './components/GameOverScreen'
 import './App.css'
 import { Board } from './components/Board'
 import { useGame } from './game/react/useGame'
+import { useGameAudioIntegration } from './game/react/useGameWithAudio'
 import type { GameMode } from './game/types'
 import MainMenu from './components/MainMenu'
 import LevelSelector from './components/LevelSelector'
@@ -12,6 +13,7 @@ import { calculateStarsFromGameState } from './game/logic/stars'
 import { loadStats, updateStats, saveStats } from './game/storage/stats'
 import LeftSidebar from './components/layout/LeftSidebar'
 import RightSidebar from './components/layout/RightSidebar'
+import { AudioControls } from './components/AudioControls'
 
 // États de l'application
 type AppScreen = 'main-menu' | 'level-selector' | 'game' | 'game-over'
@@ -21,6 +23,9 @@ function App() {
   const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
   const [selectedLevel, setSelectedLevel] = useState<number>(1)
   const { state, stepInput, reset, restart } = useGame(selectedMode)
+
+  // Initialize audio system
+  useGameAudioIntegration(state)
 
   // Charger la progression au démarrage
   useEffect(() => {
@@ -358,7 +363,7 @@ function App() {
 
               {/* Controls */}
               <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center gap-4 flex-wrap">
                   <button
                     onClick={handleBackToLevelSelector}
                     className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-mono font-bold transition-colors duration-200"
@@ -371,6 +376,9 @@ function App() {
                   >
                     🔄 RESTART
                   </button>
+
+                  {/* Audio Controls - Compact version for mobile */}
+                  <AudioControls compact className="ml-2" />
                 </div>
 
                 {/* Instructions */}

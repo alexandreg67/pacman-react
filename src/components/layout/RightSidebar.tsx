@@ -9,6 +9,7 @@ import {
   PerformanceMonitor,
   useFPS,
 } from '../stats/GameStatsComponents'
+import { AudioControls } from '../AudioControls'
 
 interface RightSidebarProps {
   // Stats de jeu
@@ -107,6 +108,12 @@ const RightSidebar: React.FC<RightSidebarProps> = React.memo(
             <PerformanceMonitor gameTime={gameTime} fps={fps} showInProduction={false} size="sm" />
           </>
         )}
+
+        {/* Séparateur visuel */}
+        <div className="border-t border-gray-700/50 mx-4"></div>
+
+        {/* Contrôles Audio */}
+        <AudioControls />
 
         {/* Séparateur visuel */}
         <div className="border-t border-gray-700/50 mx-4"></div>
